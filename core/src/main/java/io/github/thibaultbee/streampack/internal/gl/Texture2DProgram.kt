@@ -23,6 +23,8 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.opengl.GLUtils
 import android.content.Context
+import android.opengl.Matrix
+import io.github.thibaultbee.streampack.R
 
 /**
  * GL program and supporting functions for textured 2D shapes.
@@ -184,6 +186,7 @@ class Texture2DProgram {
      * @param texStride Width, in bytes, of the texture data for each vertex.
      */
     fun draw(
+        context: Context,
         mvpMatrix: FloatArray, vertexBuffer: FloatBuffer, firstVertex: Int,
         vertexCount: Int, coordsPerVertex: Int, vertexStride: Int,
         texMatrix: FloatArray, texBuffer: FloatBuffer, textureId: Int, texStride: Int
@@ -194,49 +197,82 @@ class Texture2DProgram {
         GLES20.glUseProgram(programHandle)
         GlUtils.checkGlError("glUseProgram")
 
-        // Set the texture.
+        // Set the texture for the main video frame
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, textureId)
 
-        // Copy the model / view / projection matrix over.
+        // Copy the model / view / projection matrix
         GLES20.glUniformMatrix4fv(uMVPMatrixLoc, 1, false, mvpMatrix, 0)
         GlUtils.checkGlError("glUniformMatrix4fv")
 
-        // Copy the texture transformation matrix over.
+        // Copy the texture transformation matrix
         GLES20.glUniformMatrix4fv(uTexMatrixLoc, 1, false, texMatrix, 0)
         GlUtils.checkGlError("glUniformMatrix4fv")
 
-        // Enable the "aPosition" vertex attribute.
+        // Enable the "aPosition" vertex attribute
         GLES20.glEnableVertexAttribArray(aPositionLoc)
         GlUtils.checkGlError("glEnableVertexAttribArray")
 
-        // Connect vertexBuffer to "aPosition".
+        // Connect vertexBuffer to "aPosition"
         GLES20.glVertexAttribPointer(
             aPositionLoc, coordsPerVertex,
             GLES20.GL_FLOAT, false, vertexStride, vertexBuffer
         )
         GlUtils.checkGlError("glVertexAttribPointer")
 
-        // Enable the "aTextureCoord" vertex attribute.
+        // Enable the "aTextureCoord" vertex attribute
         GLES20.glEnableVertexAttribArray(aTextureCoordLoc)
         GlUtils.checkGlError("glEnableVertexAttribArray")
 
-        // Connect texBuffer to "aTextureCoord".
+        // Connect texBuffer to "aTextureCoord"
         GLES20.glVertexAttribPointer(
             aTextureCoordLoc, 2,
             GLES20.GL_FLOAT, false, texStride, texBuffer
         )
         GlUtils.checkGlError("glVertexAttribPointer")
 
-        // Draw the rect.
+        // Draw the video frame
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, firstVertex, vertexCount)
         GlUtils.checkGlError("glDrawArrays")
 
-        // Done -- disable vertex array, texture, and program.
+        // --- Draw the Logo Overlay ---
+        GLES20.glEnable(GLES20.GL_BLEND)
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA)
+
+        val logoTextureId = loadLogoTexture(context, R.drawable.logo)
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE1)
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, logoTextureId) // Logo texture
+
+        // Adjust MVP matrix for logo positioning
+        val logoMvpMatrix = FloatArray(16)
+        Matrix.setIdentityM(logoMvpMatrix, 0)
+        Matrix.translateM(logoMvpMatrix, 0, 0.7f, 0.7f, 0f) // Adjust position (top-right corner)
+        Matrix.scaleM(logoMvpMatrix, 0, 0.2f, 0.2f, 1f)  // Scale down logo
+
+        GLES20.glUniformMatrix4fv(uMVPMatrixLoc, 1, false, logoMvpMatrix, 0)
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, firstVertex, vertexCount)
+
+        GLES20.glDisable(GLES20.GL_BLEND)
+
+        // Disable vertex attributes, texture, and program
         GLES20.glDisableVertexAttribArray(aPositionLoc)
         GLES20.glDisableVertexAttribArray(aTextureCoordLoc)
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, 0)
         GLES20.glUseProgram(0)
+    }
+
+    fun loadLogoTexture(context: Context, resourceId: Int): Int {
+        val bitmap = BitmapFactory.decodeResource(context.resources, resourceId)
+        val textureHandle = IntArray(1)
+        GLES20.glGenTextures(1, textureHandle, 0)
+
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0])
+        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0)
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR)
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR)
+
+        bitmap.recycle()
+        return textureHandle[0]
     }
 
     companion object {

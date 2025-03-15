@@ -125,62 +125,10 @@ class FullFrameRect(var program: Texture2DProgram) {
     fun drawFrame(textureId: Int, texMatrix: FloatArray, context: Context) {
         // Use the identity matrix for MVP so our 2x2 FULL_RECTANGLE covers the viewport.
         program.draw(
+            context,
             mvpMatrix, FULL_RECTANGLE_BUF, 0,
             4, 2, 2 * Float.SIZE_BYTES,
             texMatrix, FULL_RECTANGLE_TEX_BUF, textureId, 2 * Float.SIZE_BYTES
         )
-
-        val resId = R.drawable.logo
-        if (resId == 0) {
-            Log.e("FullFrameRect", "Logo resource ID is invalid!")
-        } else {
-            GLES20.glEnable(GLES20.GL_BLEND)
-            GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA)
-            val logoTextureId = loadTextureFromBitmap(context.applicationContext, R.drawable.logo)
-            drawLogoFrame(logoTextureId)  // Render the logo on top
-            GLES20.glDisable(GLES20.GL_BLEND)
-        }
-    }
-
-    private fun drawLogoFrame(logoTextureId: Int) {
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, logoTextureId)
-
-        val vertexData = floatArrayOf(
-            // X,   Y,   U,  V
-            1.0f,  1.0f,  1f, 0f,  // Top-right (moved to absolute top)
-            1.0f,  0.8f,  1f, 1f,  // Bottom-right
-            0.8f,  1.0f,  0f, 0f,  // Top-left
-            0.8f,  0.8f,  0f, 1f   // Bottom-left
-        )
-
-        val vertexBuffer = ByteBuffer.allocateDirect(vertexData.size * 4)
-            .order(ByteOrder.nativeOrder())
-            .asFloatBuffer()
-        vertexBuffer.put(vertexData).position(0)
-
-        GLES20.glVertexAttribPointer(0, 2, GLES20.GL_FLOAT, false, 16, vertexBuffer)
-        GLES20.glEnableVertexAttribArray(0)
-
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
-    }
-
-    private fun loadTextureFromBitmap(context: Context, resourceId: Int): Int {
-        val textureHandle = IntArray(1)
-        GLES20.glGenTextures(1, textureHandle, 0)
-
-        if (textureHandle[0] != 0) {
-            val bitmap: Bitmap = BitmapFactory.decodeResource(context.resources, resourceId)
-
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0])
-            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR)
-            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR)
-            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0)
-
-            bitmap.recycle()
-        } else {
-            throw RuntimeException("Error loading texture.")
-        }
-
-        return textureHandle[0]
     }
 }
