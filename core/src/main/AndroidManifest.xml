@@ -1,0 +1,12 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- Application requires POST_NOTIFICATIONS only for screen recorder service notification -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+</manifest>
