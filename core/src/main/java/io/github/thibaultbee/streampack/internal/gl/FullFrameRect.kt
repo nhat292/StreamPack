@@ -22,6 +22,7 @@ import android.graphics.BitmapFactory
 import android.opengl.GLES20
 import android.opengl.GLUtils
 import android.opengl.Matrix
+import android.util.Log
 import android.util.Size
 import io.github.thibaultbee.streampack.R
 import java.nio.ByteBuffer
@@ -129,13 +130,16 @@ class FullFrameRect(var program: Texture2DProgram) {
             texMatrix, FULL_RECTANGLE_TEX_BUF, textureId, 2 * Float.SIZE_BYTES
         )
 
-        GLES20.glEnable(GLES20.GL_BLEND)
-        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA)
-
-        val logoTextureId = loadTextureFromBitmap(context, R.drawable.logo)
-        drawLogoFrame(logoTextureId)  // Render the logo on top
-
-        GLES20.glDisable(GLES20.GL_BLEND)
+        val resId = R.drawable.logo
+        if (resId == 0) {
+            Log.e("FullFrameRect", "Logo resource ID is invalid!")
+        } else {
+            GLES20.glEnable(GLES20.GL_BLEND)
+            GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA)
+            val logoTextureId = loadTextureFromBitmap(context.applicationContext, R.drawable.logo)
+            drawLogoFrame(logoTextureId)  // Render the logo on top
+            GLES20.glDisable(GLES20.GL_BLEND)
+        }
     }
 
     private fun drawLogoFrame(logoTextureId: Int) {
