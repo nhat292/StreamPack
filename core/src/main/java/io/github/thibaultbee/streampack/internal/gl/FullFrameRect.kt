@@ -132,7 +132,7 @@ class FullFrameRect(var program: Texture2DProgram) {
         GLES20.glEnable(GLES20.GL_BLEND)
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA)
 
-        val logoTextureId = loadTextureFromBitmap(context, R.drawable.ic_baseline_linked_camera_24)
+        val logoTextureId = loadTextureFromBitmap(context, R.drawable.logo)
         drawLogoFrame(logoTextureId)  // Render the logo on top
 
         GLES20.glDisable(GLES20.GL_BLEND)
