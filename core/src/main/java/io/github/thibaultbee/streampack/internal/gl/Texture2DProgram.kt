@@ -66,12 +66,12 @@ class Texture2DProgram {
         checkLocation(uTexMatrixLoc, "uTexMatrix")
 
         // get locations of attributes and uniforms
-        aLogoPositionLoc = GLES20.glGetAttribLocation(logoProgramHandle, "aPosition")
-        checkLocation(aLogoPositionLoc, "aPosition")
-        aLogoTextureCoordLoc = GLES20.glGetAttribLocation(logoProgramHandle, "aTextureCoord")
-        checkLocation(aLogoTextureCoordLoc, "aTextureCoord")
-        uLogoMVPMatrixLoc = GLES20.glGetUniformLocation(logoProgramHandle, "uMVPMatrix")
-        checkLocation(uLogoMVPMatrixLoc, "uMVPMatrix")
+        aLogoPositionLoc = GLES20.glGetAttribLocation(logoProgramHandle, "aLogoPosition")
+        checkLocation(aLogoPositionLoc, "aLogoPosition")
+        aLogoTextureCoordLoc = GLES20.glGetAttribLocation(logoProgramHandle, "aLogoTextureCoord")
+        checkLocation(aLogoTextureCoordLoc, "aLogoTextureCoord")
+        uLogoMVPMatrixLoc = GLES20.glGetUniformLocation(logoProgramHandle, "uLogoMVPMatrix")
+        checkLocation(uLogoMVPMatrixLoc, "uLogoMVPMatrix")
     }
 
     /**
@@ -343,14 +343,14 @@ class Texture2DProgram {
     }
     """
 
-        private const val VERTEX_SHADER_2D = """uniform mat4 uMVPMatrix;
-    uniform mat4 uMVPMatrix;
-    attribute vec4 aPosition;
-    attribute vec2 aTextureCoord;
+        private const val VERTEX_SHADER_2D = """uniform mat4 uLogoMVPMatrix;
+    uniform mat4 uLogoMVPMatrix;
+    attribute vec4 aLogoPosition;
+    attribute vec2 aLogoTextureCoord;
     varying vec2 vTextureCoord;
     void main() {
-        gl_Position = uMVPMatrix * aPosition;
-        vTextureCoord = aTextureCoord;
+        gl_Position = uLogoMVPMatrix * aLogoPosition;
+        vTextureCoord = aLogoTextureCoord;
     }
     """
 
