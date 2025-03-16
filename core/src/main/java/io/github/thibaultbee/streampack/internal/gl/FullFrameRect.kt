@@ -53,6 +53,8 @@ class FullFrameRect(var program: Texture2DProgram) {
 
         private val FULL_RECTANGLE_BUF: FloatBuffer = createFloatBuffer(FULL_RECTANGLE_COORDS)
 
+        private val FULL_RECTANGLE_BUF_LOGO: FloatBuffer = createFloatBuffer(FULL_RECTANGLE_COORDS)
+
         private val FULL_RECTANGLE_TEX_COORDS = floatArrayOf(
             0.0f, 0.0f,  // 0 bottom left
             1.0f, 0.0f,  // 1 bottom right
@@ -60,6 +62,9 @@ class FullFrameRect(var program: Texture2DProgram) {
             1.0f, 1.0f // 3 top right
         )
         private val FULL_RECTANGLE_TEX_BUF: FloatBuffer =
+            createFloatBuffer(FULL_RECTANGLE_TEX_COORDS)
+
+        private val FULL_RECTANGLE_TEX_BUF_LOGO: FloatBuffer =
             createFloatBuffer(FULL_RECTANGLE_TEX_COORDS)
 
         /**
@@ -126,9 +131,9 @@ class FullFrameRect(var program: Texture2DProgram) {
         // Use the identity matrix for MVP so our 2x2 FULL_RECTANGLE covers the viewport.
         program.draw(
             context,
-            mvpMatrix, FULL_RECTANGLE_BUF, 0,
+            mvpMatrix, FULL_RECTANGLE_BUF, FULL_RECTANGLE_BUF_LOGO, 0,
             4, 2, 2 * Float.SIZE_BYTES,
-            texMatrix, FULL_RECTANGLE_TEX_BUF, textureId, 2 * Float.SIZE_BYTES
+            texMatrix, FULL_RECTANGLE_TEX_BUF, FULL_RECTANGLE_TEX_BUF_LOGO, textureId, 2 * Float.SIZE_BYTES
         )
     }
 }

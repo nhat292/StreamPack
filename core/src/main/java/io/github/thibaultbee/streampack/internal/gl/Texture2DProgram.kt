@@ -35,11 +35,16 @@ import io.github.thibaultbee.streampack.R
 class Texture2DProgram {
     // Handles to the GL program and various components of it.
     private val programHandle: Int
-    private val logoProgramHandle: Int
     private val uMVPMatrixLoc: Int
     private val uTexMatrixLoc: Int
     private val aPositionLoc: Int
     private val aTextureCoordLoc: Int
+
+    private val logoProgramHandle: Int
+    private val uLogoMVPMatrixLoc: Int
+    private val uLogoTexMatrixLoc: Int
+    private val aLogoPositionLoc: Int
+    private val aLogoTextureCoordLoc: Int
 
     init {
         programHandle = createProgram(VERTEX_SHADER, FRAGMENT_SHADER_EXT)
@@ -60,6 +65,16 @@ class Texture2DProgram {
         checkLocation(uMVPMatrixLoc, "uMVPMatrix")
         uTexMatrixLoc = GLES20.glGetUniformLocation(programHandle, "uTexMatrix")
         checkLocation(uTexMatrixLoc, "uTexMatrix")
+
+        // get locations of attributes and uniforms
+        aLogoPositionLoc = GLES20.glGetAttribLocation(logoProgramHandle, "aPosition")
+        checkLocation(aLogoPositionLoc, "aPosition")
+        aLogoTextureCoordLoc = GLES20.glGetAttribLocation(logoProgramHandle, "aTextureCoord")
+        checkLocation(aLogoTextureCoordLoc, "aTextureCoord")
+        uLogoMVPMatrixLoc = GLES20.glGetUniformLocation(logoProgramHandle, "uMVPMatrix")
+        checkLocation(uLogoMVPMatrixLoc, "uMVPMatrix")
+        uLogoTexMatrixLoc = GLES20.glGetUniformLocation(logoProgramHandle, "uTexMatrix")
+        checkLocation(uLogoTexMatrixLoc, "uTexMatrix")
     }
 
     /**
@@ -192,9 +207,9 @@ class Texture2DProgram {
      */
     fun draw(
         context: Context,
-        mvpMatrix: FloatArray, vertexBuffer: FloatBuffer, firstVertex: Int,
+        mvpMatrix: FloatArray, vertexBuffer: FloatBuffer, logoVertexBuffer: FloatBuffer, firstVertex: Int,
         vertexCount: Int, coordsPerVertex: Int, vertexStride: Int,
-        texMatrix: FloatArray, texBuffer: FloatBuffer, textureId: Int, texStride: Int
+        texMatrix: FloatArray, texBuffer: FloatBuffer, logoTexBuffer: FloatBuffer, textureId: Int, texStride: Int
     ) {
         GlUtils.checkGlError("draw start")
 
@@ -259,14 +274,14 @@ class Texture2DProgram {
         GLES20.glUniformMatrix4fv(uMVPMatrixLoc, 1, false, logoMvpMatrix, 0)
 
         // Draw the logo (use a separate vertex buffer for the logo quad)
-        GLES20.glEnableVertexAttribArray(aPositionLoc)
+        GLES20.glEnableVertexAttribArray(aLogoPositionLoc)
         GLES20.glVertexAttribPointer(
-            aPositionLoc, 2, GLES20.GL_FLOAT, false, 0, vertexBuffer
+            aLogoPositionLoc, 2, GLES20.GL_FLOAT, false, 0, logoVertexBuffer
         )
 
-        GLES20.glEnableVertexAttribArray(aTextureCoordLoc)
+        GLES20.glEnableVertexAttribArray(aLogoTextureCoordLoc)
         GLES20.glVertexAttribPointer(
-            aTextureCoordLoc, 2, GLES20.GL_FLOAT, false, 0, texBuffer
+            aLogoTextureCoordLoc, 2, GLES20.GL_FLOAT, false, 0, logoTexBuffer
         )
 
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
