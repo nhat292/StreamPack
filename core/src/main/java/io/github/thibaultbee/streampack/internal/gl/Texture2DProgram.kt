@@ -271,17 +271,17 @@ class Texture2DProgram {
         Matrix.translateM(logoMvpMatrix, 0, 0.7f, 0.7f, 0f) // Adjust position (top-right corner)
         Matrix.scaleM(logoMvpMatrix, 0, 0.2f, 0.2f, 1f)  // Scale down logo
 
-        GLES20.glUniformMatrix4fv(uMVPMatrixLoc, 1, false, logoMvpMatrix, 0)
+        GLES20.glUniformMatrix4fv(uLogoMVPMatrixLoc, 1, false, logoMvpMatrix, 0)
 
         // Draw the logo (use a separate vertex buffer for the logo quad)
         GLES20.glEnableVertexAttribArray(aLogoPositionLoc)
         GLES20.glVertexAttribPointer(
-            aLogoPositionLoc, 2, GLES20.GL_FLOAT, false, 0, logoVertexBuffer
+            aLogoPositionLoc, 2, GLES20.GL_FLOAT, false, vertexStride, logoVertexBuffer
         )
 
         GLES20.glEnableVertexAttribArray(aLogoTextureCoordLoc)
         GLES20.glVertexAttribPointer(
-            aLogoTextureCoordLoc, 2, GLES20.GL_FLOAT, false, 0, logoTexBuffer
+            aLogoTextureCoordLoc, 2, GLES20.GL_FLOAT, false, texStride, logoTexBuffer
         )
 
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
