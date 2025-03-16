@@ -344,7 +344,6 @@ class Texture2DProgram {
     """
 
         private const val VERTEX_SHADER_2D = """uniform mat4 uLogoMVPMatrix;
-    uniform mat4 uLogoMVPMatrix;
     attribute vec4 aLogoPosition;
     attribute vec2 aLogoTextureCoord;
     varying vec2 vTextureCoord;
