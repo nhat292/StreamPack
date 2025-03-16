@@ -257,7 +257,7 @@ class Texture2DProgram {
         GLES20.glUniformMatrix4fv(uLogoMVPMatrixLoc, 1, false, logoMvpMatrix, 0)
 
         GLES20.glEnableVertexAttribArray(aLogoPositionLoc)
-        GLES20.glVertexAttribPointer(aLogoPositionLoc, 2, GLES20.GL_FLOAT, false, 0, logoVertexBuffer)
+        GLES20.glVertexAttribPointer(aLogoPositionLoc, 4, GLES20.GL_FLOAT, false, 0, logoVertexBuffer)
 
         GLES20.glEnableVertexAttribArray(aLogoTextureCoordLoc)
         GLES20.glVertexAttribPointer(aLogoTextureCoordLoc, 2, GLES20.GL_FLOAT, false, 0, logoTexBuffer)
@@ -323,7 +323,7 @@ class Texture2DProgram {
     """
 
         private const val VERTEX_SHADER_2D = """uniform mat4 uLogoMVPMatrix;
-    attribute vec2 aLogoPosition;
+    attribute vec4 aLogoPosition;
     attribute vec2 aLogoTextureCoord;
     varying vec2 vTextureCoord;
     void main() {
