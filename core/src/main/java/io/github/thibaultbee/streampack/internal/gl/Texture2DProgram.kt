@@ -42,7 +42,6 @@ class Texture2DProgram {
 
     private val logoProgramHandle: Int
     private val uLogoMVPMatrixLoc: Int
-    private val uLogoTexMatrixLoc: Int
     private val aLogoPositionLoc: Int
     private val aLogoTextureCoordLoc: Int
 
@@ -51,7 +50,7 @@ class Texture2DProgram {
         if (programHandle == 0) {
             throw RuntimeException("Unable to create program")
         }
-        logoProgramHandle = createProgram(VERTEX_SHADER, FRAGMENT_SHADER_EXT)
+        logoProgramHandle = createProgram(VERTEX_SHADER_2D, FRAGMENT_SHADER_2D)
         if (logoProgramHandle == 0) {
             throw RuntimeException("Unable to create program")
         }
@@ -73,8 +72,6 @@ class Texture2DProgram {
         checkLocation(aLogoTextureCoordLoc, "aTextureCoord")
         uLogoMVPMatrixLoc = GLES20.glGetUniformLocation(logoProgramHandle, "uMVPMatrix")
         checkLocation(uLogoMVPMatrixLoc, "uMVPMatrix")
-        uLogoTexMatrixLoc = GLES20.glGetUniformLocation(logoProgramHandle, "uTexMatrix")
-        checkLocation(uLogoTexMatrixLoc, "uTexMatrix")
     }
 
     /**
@@ -86,6 +83,7 @@ class Texture2DProgram {
      */
     fun release() {
         GLES20.glDeleteProgram(programHandle)
+        GLES20.glDeleteProgram(logoProgramHandle)
     }
 
     /**
@@ -295,17 +293,29 @@ class Texture2DProgram {
         GLES20.glUseProgram(0)
     }
 
-    fun loadLogoTexture(context: Context, resourceId: Int): Int {
-        val bitmap = BitmapFactory.decodeResource(context.resources, resourceId)
+    private fun loadLogoTexture(context: Context, resourceId: Int): Int {
         val textureHandle = IntArray(1)
         GLES20.glGenTextures(1, textureHandle, 0)
 
+        if (textureHandle[0] == 0) {
+            throw RuntimeException("Error generating OpenGL texture")
+        }
+
+        val bitmap = BitmapFactory.decodeResource(context.resources, resourceId) ?: throw RuntimeException("Error loading bitmap")
+
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0])
-        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0)
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR)
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR_MIPMAP_LINEAR)
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR)
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE)
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE)
+
+        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0)
+        GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D) // Generate mipmaps for better scaling
 
         bitmap.recycle()
+
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0) // Unbind to avoid accidental modifications
+
         return textureHandle[0]
     }
 
@@ -328,6 +338,25 @@ class Texture2DProgram {
     precision mediump float;
     varying vec2 vTextureCoord;
     uniform samplerExternalOES sTexture;
+    void main() {
+        gl_FragColor = texture2D(sTexture, vTextureCoord);
+    }
+    """
+
+        private const val VERTEX_SHADER_2D = """uniform mat4 uMVPMatrix;
+    uniform mat4 uMVPMatrix;
+    attribute vec4 aPosition;
+    attribute vec2 aTextureCoord;
+    varying vec2 vTextureCoord;
+    void main() {
+        gl_Position = uMVPMatrix * aPosition;
+        vTextureCoord = aTextureCoord;
+    }
+    """
+
+        private const val FRAGMENT_SHADER_2D = """precision mediump float;
+    varying vec2 vTextureCoord;
+    uniform sampler2D sTexture;
     void main() {
         gl_FragColor = texture2D(sTexture, vTextureCoord);
     }
