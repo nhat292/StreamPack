@@ -306,24 +306,20 @@ class Texture2DProgram {
         val textureHandle = IntArray(1)
         GLES20.glGenTextures(1, textureHandle, 0)
 
-        if (textureHandle[0] == 0) {
-            throw RuntimeException("Error generating OpenGL texture")
+        if (textureHandle[0] != 0) {
+            val options = BitmapFactory.Options()
+            options.inScaled = false  // No pre-scaling
+
+            val bitmap = BitmapFactory.decodeResource(context.resources, resourceId, options) ?: throw RuntimeException("Error loading bitmap: resource not found")
+
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0])
+
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST)
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR)
+
+            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0)
+            bitmap.recycle()
         }
-
-        val bitmap = BitmapFactory.decodeResource(context.resources, resourceId) ?: throw RuntimeException("Error loading bitmap")
-
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0])
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR_MIPMAP_LINEAR)
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR)
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE)
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE)
-
-        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0)
-        GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D) // Generate mipmaps for better scaling
-
-        bitmap.recycle()
-
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0) // Unbind to avoid accidental modifications
 
         return textureHandle[0]
     }
