@@ -66,13 +66,20 @@ class FullFrameRect(var program: Texture2DProgram) {
             0.0f, 1.0f,  // 2 top left
             1.0f, 1.0f // 3 top right
         )
+
+        private val logoTexCoords = floatArrayOf(
+            0.0f, 1.0f, // Top-left
+            1.0f, 1.0f, // Top-right
+            0.0f, 0.0f, // Bottom-left
+            1.0f, 0.0f  // Bottom-right
+        )
         private val FULL_RECTANGLE_TEX_BUF: FloatBuffer =
             createFloatBuffer(FULL_RECTANGLE_TEX_COORDS)
 
         private val FULL_RECTANGLE_TEX_BUF_LOGO: FloatBuffer = ByteBuffer.allocateDirect(FULL_RECTANGLE_TEX_COORDS.size * 4)
             .order(ByteOrder.nativeOrder())
             .asFloatBuffer().apply {
-                put(FULL_RECTANGLE_TEX_COORDS)
+                put(logoTexCoords)
                 position(0)
             }
 
