@@ -236,23 +236,23 @@ class Texture2DProgram {
         GlUtils.checkGlError("glDrawArrays")
 
         // --- Draw the Logo Overlay ---
-//        GLES20.glEnable(GLES20.GL_BLEND)
-//        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA)
-//
-//        val logoTextureId = loadLogoTexture(context, R.drawable.logo)
-//        GLES20.glActiveTexture(GLES20.GL_TEXTURE1)
-//        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, logoTextureId) // Logo texture
-//
-//        // Adjust MVP matrix for logo positioning
-//        val logoMvpMatrix = FloatArray(16)
-//        Matrix.setIdentityM(logoMvpMatrix, 0)
-//        Matrix.translateM(logoMvpMatrix, 0, 0.7f, 0.7f, 0f) // Adjust position (top-right corner)
-//        Matrix.scaleM(logoMvpMatrix, 0, 0.2f, 0.2f, 1f)  // Scale down logo
-//
-//        GLES20.glUniformMatrix4fv(uMVPMatrixLoc, 1, false, logoMvpMatrix, 0)
-//        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, firstVertex, vertexCount)
-//
-//        GLES20.glDisable(GLES20.GL_BLEND)
+        GLES20.glEnable(GLES20.GL_BLEND)
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA)
+
+        val logoTextureId = loadLogoTexture(context, R.drawable.logo)
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE1)
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, logoTextureId) // Logo texture
+
+        // Adjust MVP matrix for logo positioning
+        val logoMvpMatrix = FloatArray(16)
+        Matrix.setIdentityM(logoMvpMatrix, 0)
+        Matrix.translateM(logoMvpMatrix, 0, 0.7f, 0.7f, 0f) // Adjust position (top-right corner)
+        Matrix.scaleM(logoMvpMatrix, 0, 0.2f, 0.2f, 1f)  // Scale down logo
+
+        GLES20.glUniformMatrix4fv(uMVPMatrixLoc, 1, false, logoMvpMatrix, 0)
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, firstVertex, vertexCount)
+
+        GLES20.glDisable(GLES20.GL_BLEND)
 
         // Disable vertex attributes, texture, and program
         GLES20.glDisableVertexAttribArray(aPositionLoc)
