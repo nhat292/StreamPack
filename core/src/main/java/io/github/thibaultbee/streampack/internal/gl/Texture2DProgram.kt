@@ -35,6 +35,7 @@ import io.github.thibaultbee.streampack.R
 class Texture2DProgram {
     // Handles to the GL program and various components of it.
     private val programHandle: Int
+    private val logoProgramHandle: Int
     private val uMVPMatrixLoc: Int
     private val uTexMatrixLoc: Int
     private val aPositionLoc: Int
@@ -43,6 +44,10 @@ class Texture2DProgram {
     init {
         programHandle = createProgram(VERTEX_SHADER, FRAGMENT_SHADER_EXT)
         if (programHandle == 0) {
+            throw RuntimeException("Unable to create program")
+        }
+        logoProgramHandle = createProgram(VERTEX_SHADER, FRAGMENT_SHADER_EXT)
+        if (logoProgramHandle == 0) {
             throw RuntimeException("Unable to create program")
         }
 
@@ -240,6 +245,8 @@ class Texture2DProgram {
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA)
 
         val logoTextureId = loadLogoTexture(context, R.drawable.logo)
+
+        GLES20.glUseProgram(logoProgramHandle) // Use a different shader program for the logo
         GLES20.glActiveTexture(GLES20.GL_TEXTURE1)
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, logoTextureId) // Logo texture
 
@@ -250,7 +257,19 @@ class Texture2DProgram {
         Matrix.scaleM(logoMvpMatrix, 0, 0.2f, 0.2f, 1f)  // Scale down logo
 
         GLES20.glUniformMatrix4fv(uMVPMatrixLoc, 1, false, logoMvpMatrix, 0)
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, firstVertex, vertexCount)
+
+        // Draw the logo (use a separate vertex buffer for the logo quad)
+        GLES20.glEnableVertexAttribArray(aPositionLoc)
+        GLES20.glVertexAttribPointer(
+            aPositionLoc, 2, GLES20.GL_FLOAT, false, 0, vertexBuffer
+        )
+
+        GLES20.glEnableVertexAttribArray(aTextureCoordLoc)
+        GLES20.glVertexAttribPointer(
+            aTextureCoordLoc, 2, GLES20.GL_FLOAT, false, 0, texBuffer
+        )
+
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
 
         GLES20.glDisable(GLES20.GL_BLEND)
 
