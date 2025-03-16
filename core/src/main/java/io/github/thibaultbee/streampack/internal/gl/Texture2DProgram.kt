@@ -45,6 +45,8 @@ class Texture2DProgram {
     private val aLogoPositionLoc: Int
     private val aLogoTextureCoordLoc: Int
 
+    private var logoTextureId: Int = -1
+
     init {
         programHandle = createProgram(VERTEX_SHADER, FRAGMENT_SHADER_EXT)
         if (programHandle == 0) {
@@ -211,59 +213,42 @@ class Texture2DProgram {
     ) {
         GlUtils.checkGlError("draw start")
 
-        // Select the program.
+        // 1️⃣ Draw Video Frame
         GLES20.glUseProgram(programHandle)
-        GlUtils.checkGlError("glUseProgram")
-
-        // Set the texture for the main video frame
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, textureId)
 
-        // Copy the model / view / projection matrix
         GLES20.glUniformMatrix4fv(uMVPMatrixLoc, 1, false, mvpMatrix, 0)
-        GlUtils.checkGlError("glUniformMatrix4fv")
-
-        // Copy the texture transformation matrix
         GLES20.glUniformMatrix4fv(uTexMatrixLoc, 1, false, texMatrix, 0)
-        GlUtils.checkGlError("glUniformMatrix4fv")
 
-        // Enable the "aPosition" vertex attribute
         GLES20.glEnableVertexAttribArray(aPositionLoc)
-        GlUtils.checkGlError("glEnableVertexAttribArray")
+        GLES20.glVertexAttribPointer(aPositionLoc, coordsPerVertex, GLES20.GL_FLOAT, false, vertexStride, vertexBuffer)
 
-        // Connect vertexBuffer to "aPosition"
-        GLES20.glVertexAttribPointer(
-            aPositionLoc, coordsPerVertex,
-            GLES20.GL_FLOAT, false, vertexStride, vertexBuffer
-        )
-        GlUtils.checkGlError("glVertexAttribPointer")
-
-        // Enable the "aTextureCoord" vertex attribute
         GLES20.glEnableVertexAttribArray(aTextureCoordLoc)
-        GlUtils.checkGlError("glEnableVertexAttribArray")
+        GLES20.glVertexAttribPointer(aTextureCoordLoc, 2, GLES20.GL_FLOAT, false, texStride, texBuffer)
 
-        // Connect texBuffer to "aTextureCoord"
-        GLES20.glVertexAttribPointer(
-            aTextureCoordLoc, 2,
-            GLES20.GL_FLOAT, false, texStride, texBuffer
-        )
-        GlUtils.checkGlError("glVertexAttribPointer")
-
-        // Draw the video frame
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, firstVertex, vertexCount)
-        GlUtils.checkGlError("glDrawArrays")
 
-        // --- Draw the Logo Overlay ---
+        // 2️⃣ Draw Logo Overlay
         GLES20.glEnable(GLES20.GL_BLEND)
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA)
+        GLES20.glDisable(GLES20.GL_DEPTH_TEST)
 
-        val logoTextureId = loadLogoTexture(context, R.drawable.logo)
+        if (logoTextureId == -1) {
+            logoTextureId = loadLogoTexture(context.applicationContext, R.drawable.logo)
+        }
 
-        GLES20.glUseProgram(logoProgramHandle) // Use a different shader program for the logo
+        GLES20.glUseProgram(logoProgramHandle)
         GLES20.glActiveTexture(GLES20.GL_TEXTURE1)
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, logoTextureId) // Logo texture
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, logoTextureId)
 
-        // Adjust MVP matrix for logo positioning
+        // Set Texture Uniform for Logo
+        val uLogoTextureLoc = GLES20.glGetUniformLocation(logoProgramHandle, "sTexture")
+        if (uLogoTextureLoc != -1) {
+            GLES20.glUniform1i(uLogoTextureLoc, 1)
+        }
+
+        // Adjust Logo Position
         val logoMvpMatrix = FloatArray(16)
         Matrix.setIdentityM(logoMvpMatrix, 0)
         Matrix.translateM(logoMvpMatrix, 0, 0.7f, 0.7f, 0f) // Adjust position (top-right corner)
@@ -271,26 +256,20 @@ class Texture2DProgram {
 
         GLES20.glUniformMatrix4fv(uLogoMVPMatrixLoc, 1, false, logoMvpMatrix, 0)
 
-        // Draw the logo (use a separate vertex buffer for the logo quad)
         GLES20.glEnableVertexAttribArray(aLogoPositionLoc)
-        GLES20.glVertexAttribPointer(
-            aLogoPositionLoc, 2, GLES20.GL_FLOAT, false, vertexStride, logoVertexBuffer
-        )
+        GLES20.glVertexAttribPointer(aLogoPositionLoc, 2, GLES20.GL_FLOAT, false, 0, logoVertexBuffer)
 
         GLES20.glEnableVertexAttribArray(aLogoTextureCoordLoc)
-        GLES20.glVertexAttribPointer(
-            aLogoTextureCoordLoc, 2, GLES20.GL_FLOAT, false, texStride, logoTexBuffer
-        )
+        GLES20.glVertexAttribPointer(aLogoTextureCoordLoc, 2, GLES20.GL_FLOAT, false, 0, logoTexBuffer)
 
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
 
+        // Restore OpenGL State
+        GLES20.glDisableVertexAttribArray(aLogoPositionLoc)
+        GLES20.glDisableVertexAttribArray(aLogoTextureCoordLoc)
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0)
         GLES20.glDisable(GLES20.GL_BLEND)
-
-        // Disable vertex attributes, texture, and program
-        GLES20.glDisableVertexAttribArray(aPositionLoc)
-        GLES20.glDisableVertexAttribArray(aTextureCoordLoc)
-        GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, 0)
-        GLES20.glUseProgram(0)
+        GLES20.glEnable(GLES20.GL_DEPTH_TEST)
     }
 
     private fun loadLogoTexture(context: Context, resourceId: Int): Int {
@@ -344,7 +323,7 @@ class Texture2DProgram {
     """
 
         private const val VERTEX_SHADER_2D = """uniform mat4 uLogoMVPMatrix;
-    attribute vec4 aLogoPosition;
+    attribute vec2 aLogoPosition;
     attribute vec2 aLogoTextureCoord;
     varying vec2 vTextureCoord;
     void main() {
