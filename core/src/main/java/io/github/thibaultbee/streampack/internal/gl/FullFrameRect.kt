@@ -53,7 +53,12 @@ class FullFrameRect(var program: Texture2DProgram) {
 
         private val FULL_RECTANGLE_BUF: FloatBuffer = createFloatBuffer(FULL_RECTANGLE_COORDS)
 
-        private val FULL_RECTANGLE_BUF_LOGO: FloatBuffer = createFloatBuffer(FULL_RECTANGLE_COORDS)
+        private val FULL_RECTANGLE_BUF_LOGO: FloatBuffer = ByteBuffer.allocateDirect(FULL_RECTANGLE_COORDS.size * 4)
+            .order(ByteOrder.nativeOrder())
+            .asFloatBuffer().apply {
+                put(FULL_RECTANGLE_COORDS)
+                position(0)
+            }
 
         private val FULL_RECTANGLE_TEX_COORDS = floatArrayOf(
             0.0f, 0.0f,  // 0 bottom left
@@ -64,8 +69,12 @@ class FullFrameRect(var program: Texture2DProgram) {
         private val FULL_RECTANGLE_TEX_BUF: FloatBuffer =
             createFloatBuffer(FULL_RECTANGLE_TEX_COORDS)
 
-        private val FULL_RECTANGLE_TEX_BUF_LOGO: FloatBuffer =
-            createFloatBuffer(FULL_RECTANGLE_TEX_COORDS)
+        private val FULL_RECTANGLE_TEX_BUF_LOGO: FloatBuffer = ByteBuffer.allocateDirect(FULL_RECTANGLE_TEX_COORDS.size * 4)
+            .order(ByteOrder.nativeOrder())
+            .asFloatBuffer().apply {
+                put(FULL_RECTANGLE_TEX_COORDS)
+                position(0)
+            }
 
         /**
          * Allocates a direct float buffer, and populates it with the float array data.
