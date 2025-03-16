@@ -349,11 +349,11 @@ class Texture2DProgram {
     """
 
         private const val VERTEX_SHADER_2D = """uniform mat4 uLogoMVPMatrix;
-    attribute vec4 aLogoPosition;
+    attribute vec2 aLogoPosition;
     attribute vec2 aLogoTextureCoord;
     varying vec2 vTextureCoord;
     void main() {
-        gl_Position = uLogoMVPMatrix * aLogoPosition;
+        gl_Position = uLogoMVPMatrix * vec4(aLogoPosition, 0.0, 1.0);
         vTextureCoord = aLogoTextureCoord;
     }
     """
