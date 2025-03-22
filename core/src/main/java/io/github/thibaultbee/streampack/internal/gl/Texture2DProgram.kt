@@ -255,7 +255,6 @@ class Texture2DProgram {
             if (textureHandle[0] != 0) {
                 val options = BitmapFactory.Options()
                 options.inScaled = false  // No pre-scaling
-                options.inJustDecodeBounds = true
 
                 val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.logo, options) ?: throw RuntimeException("Error loading bitmap: resource not found")
 
