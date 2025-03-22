@@ -255,6 +255,7 @@ class Texture2DProgram {
             if (textureHandle[0] != 0) {
                 val options = BitmapFactory.Options()
                 options.inScaled = false  // No pre-scaling
+                options.inPreferredConfig = Bitmap.Config.ARGB_8888
 
                 val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.logo, options) ?: throw RuntimeException("Error loading bitmap: resource not found")
 
@@ -262,10 +263,11 @@ class Texture2DProgram {
 
                 GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0])
 
-                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR)
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR_MIPMAP_LINEAR)
                 GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR)
 
                 GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0)
+                GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D)
                 bitmap.recycle()
             }
 
