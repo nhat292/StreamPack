@@ -246,8 +246,31 @@ class Texture2DProgram {
         GLES20.glDisable(GLES20.GL_DEPTH_TEST)
         GlUtils.checkGlError("glDisable GL_DEPTH_TEST")
 
+        var logoAspect: Float = 1f
         if (logoTextureId == -1) {
-            logoTextureId = loadLogoTexture(context.applicationContext, R.drawable.logo)
+
+            val textureHandle = IntArray(1)
+            GLES20.glGenTextures(1, textureHandle, 0)
+
+            if (textureHandle[0] != 0) {
+                val options = BitmapFactory.Options()
+                options.inScaled = false  // No pre-scaling
+                options.inJustDecodeBounds = true
+
+                val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.logo, options) ?: throw RuntimeException("Error loading bitmap: resource not found")
+
+                logoAspect = options.outWidth.toFloat() / options.outHeight.toFloat()
+
+                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0])
+
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST)
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR)
+
+                GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0)
+                bitmap.recycle()
+            }
+
+            logoTextureId = textureHandle[0]
             GlUtils.checkGlError("loadLogoTexture")
         }
 
@@ -271,14 +294,14 @@ class Texture2DProgram {
         val logoMvpMatrix = FloatArray(16)
         Matrix.setIdentityM(logoMvpMatrix, 0)
         Matrix.translateM(logoMvpMatrix, 0, 0.7f, 0.7f, 0f) // Adjust position (top-right corner)
-        Matrix.scaleM(logoMvpMatrix, 0, 0.2f, 0.2f, 1f)  // Scale down logo
+        Matrix.scaleM(logoMvpMatrix, 0, 0.2f, 0.2f * logoAspect, 1f)  // Scale down logo
 
         GLES20.glUniformMatrix4fv(uLogoMVPMatrixLoc, 1, false, logoMvpMatrix, 0)
         GlUtils.checkGlError("glUniformMatrix4fv logo")
 
         GLES20.glEnableVertexAttribArray(aLogoPositionLoc)
         GlUtils.checkGlError("glEnableVertexAttribArray logo position")
-        GLES20.glVertexAttribPointer(aLogoPositionLoc, 4, GLES20.GL_FLOAT, false, 0, logoVertexBuffer)
+        GLES20.glVertexAttribPointer(aLogoPositionLoc, 2, GLES20.GL_FLOAT, false, 0, logoVertexBuffer)
         GlUtils.checkGlError("glVertexAttribPointer logo position")
 
         GLES20.glEnableVertexAttribArray(aLogoTextureCoordLoc)
@@ -300,28 +323,6 @@ class Texture2DProgram {
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, 0)
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0)
         GLES20.glUseProgram(0)
-    }
-
-    private fun loadLogoTexture(context: Context, resourceId: Int): Int {
-        val textureHandle = IntArray(1)
-        GLES20.glGenTextures(1, textureHandle, 0)
-
-        if (textureHandle[0] != 0) {
-            val options = BitmapFactory.Options()
-            options.inScaled = false  // No pre-scaling
-
-            val bitmap = BitmapFactory.decodeResource(context.resources, resourceId, options) ?: throw RuntimeException("Error loading bitmap: resource not found")
-
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0])
-
-            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST)
-            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR)
-
-            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0)
-            bitmap.recycle()
-        }
-
-        return textureHandle[0]
     }
 
     companion object {
