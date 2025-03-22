@@ -292,8 +292,8 @@ class Texture2DProgram {
         // Adjust Logo Position
         val logoMvpMatrix = FloatArray(16)
         Matrix.setIdentityM(logoMvpMatrix, 0)
-        Matrix.translateM(logoMvpMatrix, 0, 0.8f, 0.8f, 0f) // Adjust position (top-right corner)
-        Matrix.scaleM(logoMvpMatrix, 0, 0.22f, 0.4f, 1f)  // Scale down logo
+        Matrix.translateM(logoMvpMatrix, 0, 0.85f, 0.85f, 0f) // Adjust position (top-right corner)
+        Matrix.scaleM(logoMvpMatrix, 0, 0.11f, 0.2f, 1f)  // Scale down logo
 
         GLES20.glUniformMatrix4fv(uLogoMVPMatrixLoc, 1, false, logoMvpMatrix, 0)
         GlUtils.checkGlError("glUniformMatrix4fv logo")
