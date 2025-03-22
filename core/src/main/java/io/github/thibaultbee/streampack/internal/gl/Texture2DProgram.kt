@@ -262,7 +262,7 @@ class Texture2DProgram {
 
                 GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0])
 
-                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST)
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR)
                 GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR)
 
                 GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0)
@@ -292,8 +292,8 @@ class Texture2DProgram {
         // Adjust Logo Position
         val logoMvpMatrix = FloatArray(16)
         Matrix.setIdentityM(logoMvpMatrix, 0)
-        Matrix.translateM(logoMvpMatrix, 0, 0.7f, 0.7f, 0f) // Adjust position (top-right corner)
-        Matrix.scaleM(logoMvpMatrix, 0, 0.2f, 0.2f * logoAspect, 1f)  // Scale down logo
+        Matrix.translateM(logoMvpMatrix, 0, 0.8f, 0.8f, 0f) // Adjust position (top-right corner)
+        Matrix.scaleM(logoMvpMatrix, 0, 0.2f, 0.2f, 1f)  // Scale down logo
 
         GLES20.glUniformMatrix4fv(uLogoMVPMatrixLoc, 1, false, logoMvpMatrix, 0)
         GlUtils.checkGlError("glUniformMatrix4fv logo")
