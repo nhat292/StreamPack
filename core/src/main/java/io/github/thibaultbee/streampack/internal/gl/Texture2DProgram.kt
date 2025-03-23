@@ -318,7 +318,7 @@ class Texture2DProgram {
         GlUtils.checkGlError("glDrawArrays logo")
 
         // Create text
-        if (SCORE.isNotEmpty() && OLD_SCORE.isNotEmpty()) {
+        if (SCORE.isNotEmpty()) {
             if (textTextureId == -1 || OLD_SCORE != SCORE) {
                 textTextureId = createTextTexture(SCORE, 15f, Color.WHITE)
                 OLD_SCORE = SCORE
