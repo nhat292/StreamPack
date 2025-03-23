@@ -23,6 +23,12 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.opengl.GLUtils
 import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.Rect
+import android.graphics.Typeface
 import android.opengl.Matrix
 import io.github.thibaultbee.streampack.R
 
@@ -46,6 +52,7 @@ class Texture2DProgram {
     private val aLogoTextureCoordLoc: Int
 
     private var logoTextureId: Int = -1
+    private var textTextureId: Int = -1
 
     init {
         programHandle = createProgram(VERTEX_SHADER, FRAGMENT_SHADER_EXT)
@@ -246,32 +253,8 @@ class Texture2DProgram {
         GLES20.glDisable(GLES20.GL_DEPTH_TEST)
         GlUtils.checkGlError("glDisable GL_DEPTH_TEST")
 
-        var logoAspect: Float = 1f
         if (logoTextureId == -1) {
-
-            val textureHandle = IntArray(1)
-            GLES20.glGenTextures(1, textureHandle, 0)
-
-            if (textureHandle[0] != 0) {
-                val options = BitmapFactory.Options()
-                options.inScaled = false  // No pre-scaling
-                options.inPreferredConfig = Bitmap.Config.ARGB_8888
-
-                val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.logo, options) ?: throw RuntimeException("Error loading bitmap: resource not found")
-
-                logoAspect = options.outWidth.toFloat() / options.outHeight.toFloat()
-
-                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0])
-
-                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR_MIPMAP_LINEAR)
-                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR)
-
-                GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0)
-                GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D)
-                bitmap.recycle()
-            }
-
-            logoTextureId = textureHandle[0]
+            logoTextureId = getLogoResource(context, R.drawable.logo)
             GlUtils.checkGlError("loadLogoTexture")
         }
 
@@ -310,6 +293,25 @@ class Texture2DProgram {
         GLES20.glVertexAttribPointer(aLogoTextureCoordLoc, 2, GLES20.GL_FLOAT, false, 0, logoTexBuffer)
         GlUtils.checkGlError("glVertexAttribPointer logo texture")
 
+        // Create text
+        if (textTextureId == -1) {
+            textTextureId = createTextTexture( "1-0", 40f, Color.WHITE)
+        }
+        // Set up text rendering similar to logo rendering
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE2)
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textTextureId)
+
+        val uTextTextureLoc = GLES20.glGetUniformLocation(logoProgramHandle, "sTexture")
+        if (uTextTextureLoc != -1) {
+            GLES20.glUniform1i(uTextTextureLoc, 2)
+        }
+        val textMvpMatrix = FloatArray(16)
+        Matrix.setIdentityM(textMvpMatrix, 0)
+        Matrix.translateM(textMvpMatrix, 0, -0.7f, 0.7f, 0f)  // Top-left corner
+        Matrix.scaleM(textMvpMatrix, 0, 0.25f, 0.1f, 1f)  // Scale to appropriate size
+
+        GLES20.glUniformMatrix4fv(uLogoMVPMatrixLoc, 1, false, textMvpMatrix, 0)
+
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
         GlUtils.checkGlError("glDrawArrays logo")
 
@@ -324,6 +326,70 @@ class Texture2DProgram {
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, 0)
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0)
         GLES20.glUseProgram(0)
+    }
+
+    private fun getLogoResource(context: Context, resourceId: Int): Int {
+        val textureHandle = IntArray(1)
+        GLES20.glGenTextures(1, textureHandle, 0)
+
+        if (textureHandle[0] != 0) {
+            val options = BitmapFactory.Options()
+            options.inScaled = false  // No pre-scaling
+            options.inPreferredConfig = Bitmap.Config.ARGB_8888
+
+            val bitmap = BitmapFactory.decodeResource(context.resources, resourceId, options) ?: throw RuntimeException("Error loading bitmap: resource not found")
+
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0])
+
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR_MIPMAP_LINEAR)
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR)
+
+            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0)
+            GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D)
+            bitmap.recycle()
+        }
+
+        return textureHandle[0]
+    }
+
+    private fun createTextTexture(text: String, size: Float, textColor: Int): Int {
+        // Create a bitmap with room for the text
+        val paint = Paint().apply {
+            textSize = size
+            color = textColor
+            isAntiAlias = true
+            typeface = Typeface.DEFAULT_BOLD
+            textAlign = Paint.Align.LEFT
+        }
+
+        // Measure text dimensions
+        val textBounds = Rect()
+        paint.getTextBounds(text, 0, text.length, textBounds)
+        val width = textBounds.width() + 8  // Add padding
+        val height = textBounds.height() + 8  // Add padding
+
+        // Create a bitmap and draw text on it
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
+        canvas.drawText(text, 4f, height - 4f - textBounds.bottom, paint)
+
+        // Create an OpenGL texture
+        val textureHandle = IntArray(1)
+        GLES20.glGenTextures(1, textureHandle, 0)
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0])
+
+        // Set texture parameters
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR)
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR)
+
+        // Upload bitmap to texture
+        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0)
+
+        // Clean up
+        bitmap.recycle()
+
+        return textureHandle[0]
     }
 
     companion object {
