@@ -339,7 +339,7 @@ class Texture2DProgram {
             }
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
-            Matrix.translateM(textMvpMatrix, 0, -0.9f, 0.9f, 0f)  // Top-left corner
+            Matrix.translateM(textMvpMatrix, 0, -0.7f, 0.9f, 0f)  // Top-left corner
             Matrix.scaleM(textMvpMatrix, 0, 0.25f, 0.1f, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uTextMVPMatrixLoc, 1, false, textMvpMatrix, 0)
