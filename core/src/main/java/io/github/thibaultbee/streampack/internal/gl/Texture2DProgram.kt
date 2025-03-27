@@ -61,9 +61,15 @@ class Texture2DProgram {
     private val aText2PositionLoc: Int
     private val aText2TextureCoordLoc: Int
 
+    private val text3ProgramHandle: Int
+    private val uText3MVPMatrixLoc: Int
+    private val aText3PositionLoc: Int
+    private val aText3TextureCoordLoc: Int
+
     private var logoTextureId: Int = -1
     private var textTextureId: Int = -1
     private var text2TextureId: Int = -1
+    private var text3TextureId: Int = -1
 
     init {
         programHandle = createProgram(VERTEX_SHADER, FRAGMENT_SHADER_EXT)
@@ -82,6 +88,11 @@ class Texture2DProgram {
 
         text2ProgramHandle = createProgram(VERTEX_SHADER_2D_TEXT, FRAGMENT_SHADER_2D_TEXT)
         if (text2ProgramHandle == 0) {
+            throw RuntimeException("Unable to create program")
+        }
+
+        text3ProgramHandle = createProgram(VERTEX_SHADER_2D_TEXT, FRAGMENT_SHADER_2D_TEXT)
+        if (text3ProgramHandle == 0) {
             throw RuntimeException("Unable to create program")
         }
 
@@ -119,6 +130,14 @@ class Texture2DProgram {
         uText2MVPMatrixLoc = GLES20.glGetUniformLocation(text2ProgramHandle, "uTextMVPMatrix")
         checkLocation(uText2MVPMatrixLoc, "uTextMVPMatrix")
 
+        // get locations of attributes and uniforms
+        aText3PositionLoc = GLES20.glGetAttribLocation(text3ProgramHandle, "aTextPosition")
+        checkLocation(aText3PositionLoc, "aTextPosition")
+        aText3TextureCoordLoc = GLES20.glGetAttribLocation(text3ProgramHandle, "aTextTextureCoord")
+        checkLocation(aText3TextureCoordLoc, "aText3TextureCoord")
+        uText3MVPMatrixLoc = GLES20.glGetUniformLocation(text3ProgramHandle, "uTextMVPMatrix")
+        checkLocation(uText3MVPMatrixLoc, "uTextMVPMatrix")
+
 
     }
 
@@ -134,6 +153,7 @@ class Texture2DProgram {
         GLES20.glDeleteProgram(logoProgramHandle)
         GLES20.glDeleteProgram(textProgramHandle)
         GLES20.glDeleteProgram(text2ProgramHandle)
+        GLES20.glDeleteProgram(text3ProgramHandle)
     }
 
     /**
@@ -359,7 +379,7 @@ class Texture2DProgram {
             }
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
-            Matrix.translateM(textMvpMatrix, 0, -0.7f, 0.9f, 0f)  // Top-left corner
+            Matrix.translateM(textMvpMatrix, 0, -0.7f, 0.8f, 0f)  // Top-left corner
             Matrix.scaleM(textMvpMatrix, 0, 0.25f, 0.1f, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uTextMVPMatrixLoc, 1, false, textMvpMatrix, 0)
@@ -400,7 +420,7 @@ class Texture2DProgram {
             }
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
-            Matrix.translateM(textMvpMatrix, 0, -0.7f, 0.8f, 0f)  // Top-left corner
+            Matrix.translateM(textMvpMatrix, 0, -0.7f, 0.7f, 0f)  // Top-left corner
             Matrix.scaleM(textMvpMatrix, 0, 0.25f, 0.1f, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uText2MVPMatrixLoc, 1, false, textMvpMatrix, 0)
@@ -419,6 +439,47 @@ class Texture2DProgram {
             GlUtils.checkGlError("glDrawArrays text")
         }
 
+        // Create text
+        if (TEXT3.isNotEmpty()) {
+            if (text3TextureId == -1 || OLD_TEXT3 != TEXT3) {
+                text3TextureId = createTextTexture(TEXT3, 15f, Color.WHITE)
+                OLD_TEXT3 = TEXT3
+            }
+            GLES20.glUseProgram(text3ProgramHandle)
+            GlUtils.checkGlError("glUseProgram text")
+
+            // Set up text rendering similar to logo rendering
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE4)
+            GlUtils.checkGlError("glActiveTexture")
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, text3TextureId)
+            GlUtils.checkGlError("glBindTexture text")
+
+            val uTextTextureLoc = GLES20.glGetUniformLocation(text3ProgramHandle, "sTexture")
+            if (uTextTextureLoc != -1) {
+                GLES20.glUniform1i(uTextTextureLoc, 2)
+                GlUtils.checkGlError("glUniform1i")
+            }
+            val textMvpMatrix = FloatArray(16)
+            Matrix.setIdentityM(textMvpMatrix, 0)
+            Matrix.translateM(textMvpMatrix, 0, -0.7f, 0.9f, 0f)  // Top-left corner
+            Matrix.scaleM(textMvpMatrix, 0, 0.25f, 0.1f, 1f)  // Scale to appropriate size
+
+            GLES20.glUniformMatrix4fv(uText3MVPMatrixLoc, 1, false, textMvpMatrix, 0)
+
+            GLES20.glEnableVertexAttribArray(aText3PositionLoc)
+            GlUtils.checkGlError("glEnableVertexAttribArray text position")
+            GLES20.glVertexAttribPointer(aText3PositionLoc, 2, GLES20.GL_FLOAT, false, 0, logoVertexBuffer)
+            GlUtils.checkGlError("glVertexAttribPointer text position")
+
+            GLES20.glEnableVertexAttribArray(aText3TextureCoordLoc)
+            GlUtils.checkGlError("glEnableVertexAttribArray text texture")
+            GLES20.glVertexAttribPointer(aText3TextureCoordLoc, 2, GLES20.GL_FLOAT, false, 0, logoTexBuffer)
+            GlUtils.checkGlError("glVertexAttribPointer text texture")
+
+            GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
+            GlUtils.checkGlError("glDrawArrays text")
+        }
+
         GLES20.glDisable(GLES20.GL_BLEND)
         GlUtils.checkGlError("glDisable GL_BLEND")
 
@@ -431,6 +492,8 @@ class Texture2DProgram {
         GLES20.glDisableVertexAttribArray(aTextTextureCoordLoc)
         GLES20.glDisableVertexAttribArray(aText2PositionLoc)
         GLES20.glDisableVertexAttribArray(aText2TextureCoordLoc)
+        GLES20.glDisableVertexAttribArray(aText3PositionLoc)
+        GLES20.glDisableVertexAttribArray(aText3TextureCoordLoc)
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, 0)
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0)
         GLES20.glUseProgram(0)
@@ -506,6 +569,8 @@ class Texture2DProgram {
         var OLD_TEXT1 = ""
         var TEXT2 = ""
         var OLD_TEXT2 = ""
+        var TEXT3 = ""
+        var OLD_TEXT3 = ""
 
         // Simple vertex shader, used for all programs.
         private const val VERTEX_SHADER = """uniform mat4 uMVPMatrix;
