@@ -413,7 +413,7 @@ class Texture2DProgram {
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, text2TextureId)
             GlUtils.checkGlError("glBindTexture text")
 
-            val uTextTextureLoc = GLES20.glGetUniformLocation(text2ProgramHandle, "sTexture")
+            val uTextTextureLoc = GLES20.glGetUniformLocation(text2ProgramHandle, "sTexture2")
             if (uTextTextureLoc != -1) {
                 GLES20.glUniform1i(uTextTextureLoc, 2)
                 GlUtils.checkGlError("glUniform1i")
@@ -454,7 +454,7 @@ class Texture2DProgram {
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, text3TextureId)
             GlUtils.checkGlError("glBindTexture text")
 
-            val uTextTextureLoc = GLES20.glGetUniformLocation(text3ProgramHandle, "sTexture")
+            val uTextTextureLoc = GLES20.glGetUniformLocation(text3ProgramHandle, "sTexture3")
             if (uTextTextureLoc != -1) {
                 GLES20.glUniform1i(uTextTextureLoc, 2)
                 GlUtils.checkGlError("glUniform1i")
@@ -643,9 +643,9 @@ class Texture2DProgram {
 
         private const val FRAGMENT_SHADER_2D_TEXT2 = """precision mediump float;
     varying vec2 vTextureCoord;
-    uniform sampler2D sTexture;
+    uniform sampler2D sTexture2;
     void main() {
-        gl_FragColor = texture2D(sTexture, vTextureCoord);
+        gl_FragColor = texture2D(sTexture2, vTextureCoord);
     }
     """
 
@@ -661,9 +661,9 @@ class Texture2DProgram {
 
         private const val FRAGMENT_SHADER_2D_TEXT3 = """precision mediump float;
     varying vec2 vTextureCoord;
-    uniform sampler2D sTexture;
+    uniform sampler2D sTexture3;
     void main() {
-        gl_FragColor = texture2D(sTexture, vTextureCoord);
+        gl_FragColor = texture2D(sTexture3, vTextureCoord);
     }
     """
     }
