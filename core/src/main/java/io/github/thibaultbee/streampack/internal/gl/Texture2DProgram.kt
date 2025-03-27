@@ -86,12 +86,12 @@ class Texture2DProgram {
             throw RuntimeException("Unable to create program")
         }
 
-        text2ProgramHandle = createProgram(VERTEX_SHADER_2D_TEXT, FRAGMENT_SHADER_2D_TEXT)
+        text2ProgramHandle = createProgram(VERTEX_SHADER_2D_TEXT2, FRAGMENT_SHADER_2D_TEXT2)
         if (text2ProgramHandle == 0) {
             throw RuntimeException("Unable to create program")
         }
 
-        text3ProgramHandle = createProgram(VERTEX_SHADER_2D_TEXT, FRAGMENT_SHADER_2D_TEXT)
+        text3ProgramHandle = createProgram(VERTEX_SHADER_2D_TEXT3, FRAGMENT_SHADER_2D_TEXT3)
         if (text3ProgramHandle == 0) {
             throw RuntimeException("Unable to create program")
         }
@@ -123,20 +123,20 @@ class Texture2DProgram {
         checkLocation(uTextMVPMatrixLoc, "uTextMVPMatrix")
 
         // get locations of attributes and uniforms
-        aText2PositionLoc = GLES20.glGetAttribLocation(text2ProgramHandle, "aTextPosition")
-        checkLocation(aText2PositionLoc, "aTextPosition")
-        aText2TextureCoordLoc = GLES20.glGetAttribLocation(text2ProgramHandle, "aTextTextureCoord")
+        aText2PositionLoc = GLES20.glGetAttribLocation(text2ProgramHandle, "aText2Position")
+        checkLocation(aText2PositionLoc, "aText2Position")
+        aText2TextureCoordLoc = GLES20.glGetAttribLocation(text2ProgramHandle, "aText2TextureCoord")
         checkLocation(aText2TextureCoordLoc, "aText2TextureCoord")
-        uText2MVPMatrixLoc = GLES20.glGetUniformLocation(text2ProgramHandle, "uTextMVPMatrix")
-        checkLocation(uText2MVPMatrixLoc, "uTextMVPMatrix")
+        uText2MVPMatrixLoc = GLES20.glGetUniformLocation(text2ProgramHandle, "uText2MVPMatrix")
+        checkLocation(uText2MVPMatrixLoc, "uText2MVPMatrix")
 
         // get locations of attributes and uniforms
-        aText3PositionLoc = GLES20.glGetAttribLocation(text3ProgramHandle, "aTextPosition")
-        checkLocation(aText3PositionLoc, "aTextPosition")
-        aText3TextureCoordLoc = GLES20.glGetAttribLocation(text3ProgramHandle, "aTextTextureCoord")
+        aText3PositionLoc = GLES20.glGetAttribLocation(text3ProgramHandle, "aText3Position")
+        checkLocation(aText3PositionLoc, "aText3Position")
+        aText3TextureCoordLoc = GLES20.glGetAttribLocation(text3ProgramHandle, "aText3TextureCoord")
         checkLocation(aText3TextureCoordLoc, "aText3TextureCoord")
-        uText3MVPMatrixLoc = GLES20.glGetUniformLocation(text3ProgramHandle, "uTextMVPMatrix")
-        checkLocation(uText3MVPMatrixLoc, "uTextMVPMatrix")
+        uText3MVPMatrixLoc = GLES20.glGetUniformLocation(text3ProgramHandle, "uText3MVPMatrix")
+        checkLocation(uText3MVPMatrixLoc, "uText3MVPMatrix")
 
 
     }
@@ -624,6 +624,42 @@ class Texture2DProgram {
     """
 
         private const val FRAGMENT_SHADER_2D_TEXT = """precision mediump float;
+    varying vec2 vTextureCoord;
+    uniform sampler2D sTexture;
+    void main() {
+        gl_FragColor = texture2D(sTexture, vTextureCoord);
+    }
+    """
+
+        private const val VERTEX_SHADER_2D_TEXT2 = """uniform mat4 uText2MVPMatrix;
+    attribute vec2 aText2Position;
+    attribute vec2 aText2TextureCoord;
+    varying vec2 vTextureCoord;
+    void main() {
+        gl_Position = uText2MVPMatrix * vec4(aText2Position, 0.0, 1.0);
+        vTextureCoord = aText2TextureCoord;
+    }
+    """
+
+        private const val FRAGMENT_SHADER_2D_TEXT2 = """precision mediump float;
+    varying vec2 vTextureCoord;
+    uniform sampler2D sTexture;
+    void main() {
+        gl_FragColor = texture2D(sTexture, vTextureCoord);
+    }
+    """
+
+        private const val VERTEX_SHADER_2D_TEXT3 = """uniform mat4 uText3MVPMatrix;
+    attribute vec2 aText3Position;
+    attribute vec2 aText3TextureCoord;
+    varying vec2 vTextureCoord;
+    void main() {
+        gl_Position = uText3MVPMatrix * vec4(aText3Position, 0.0, 1.0);
+        vTextureCoord = aText3TextureCoord;
+    }
+    """
+
+        private const val FRAGMENT_SHADER_2D_TEXT3 = """precision mediump float;
     varying vec2 vTextureCoord;
     uniform sampler2D sTexture;
     void main() {
