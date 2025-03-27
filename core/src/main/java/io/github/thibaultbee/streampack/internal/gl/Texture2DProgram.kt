@@ -56,8 +56,14 @@ class Texture2DProgram {
     private val aTextPositionLoc: Int
     private val aTextTextureCoordLoc: Int
 
+    private val text2ProgramHandle: Int
+    private val uText2MVPMatrixLoc: Int
+    private val aText2PositionLoc: Int
+    private val aText2TextureCoordLoc: Int
+
     private var logoTextureId: Int = -1
     private var textTextureId: Int = -1
+    private var text2TextureId: Int = -1
 
     init {
         programHandle = createProgram(VERTEX_SHADER, FRAGMENT_SHADER_EXT)
@@ -71,6 +77,11 @@ class Texture2DProgram {
 
         textProgramHandle = createProgram(VERTEX_SHADER_2D_TEXT, FRAGMENT_SHADER_2D_TEXT)
         if (textProgramHandle == 0) {
+            throw RuntimeException("Unable to create program")
+        }
+
+        text2ProgramHandle = createProgram(VERTEX_SHADER_2D_TEXT, FRAGMENT_SHADER_2D_TEXT)
+        if (text2ProgramHandle == 0) {
             throw RuntimeException("Unable to create program")
         }
 
@@ -100,6 +111,14 @@ class Texture2DProgram {
         uTextMVPMatrixLoc = GLES20.glGetUniformLocation(textProgramHandle, "uTextMVPMatrix")
         checkLocation(uTextMVPMatrixLoc, "uTextMVPMatrix")
 
+        // get locations of attributes and uniforms
+        aText2PositionLoc = GLES20.glGetAttribLocation(text2ProgramHandle, "aTextPosition")
+        checkLocation(aText2PositionLoc, "aTextPosition")
+        aText2TextureCoordLoc = GLES20.glGetAttribLocation(text2ProgramHandle, "aTextTextureCoord")
+        checkLocation(aText2TextureCoordLoc, "aText2TextureCoord")
+        uText2MVPMatrixLoc = GLES20.glGetUniformLocation(text2ProgramHandle, "uTextMVPMatrix")
+        checkLocation(uText2MVPMatrixLoc, "uTextMVPMatrix")
+
 
     }
 
@@ -114,6 +133,7 @@ class Texture2DProgram {
         GLES20.glDeleteProgram(programHandle)
         GLES20.glDeleteProgram(logoProgramHandle)
         GLES20.glDeleteProgram(textProgramHandle)
+        GLES20.glDeleteProgram(text2ProgramHandle)
     }
 
     /**
@@ -318,10 +338,10 @@ class Texture2DProgram {
         GlUtils.checkGlError("glDrawArrays logo")
 
         // Create text
-        if (SCORE.isNotEmpty()) {
-            if (textTextureId == -1 || OLD_SCORE != SCORE) {
-                textTextureId = createTextTexture(SCORE, 15f, Color.WHITE)
-                OLD_SCORE = SCORE
+        if (TEXT1.isNotEmpty()) {
+            if (textTextureId == -1 || OLD_TEXT1 != TEXT1) {
+                textTextureId = createTextTexture(TEXT1, 15f, Color.WHITE)
+                OLD_TEXT1 = TEXT1
             }
             GLES20.glUseProgram(textProgramHandle)
             GlUtils.checkGlError("glUseProgram text")
@@ -358,6 +378,47 @@ class Texture2DProgram {
             GlUtils.checkGlError("glDrawArrays text")
         }
 
+        // Create text
+        if (TEXT2.isNotEmpty()) {
+            if (text2TextureId == -1 || OLD_TEXT2 != TEXT2) {
+                text2TextureId = createTextTexture(TEXT2, 15f, Color.WHITE)
+                OLD_TEXT2 = TEXT2
+            }
+            GLES20.glUseProgram(text2ProgramHandle)
+            GlUtils.checkGlError("glUseProgram text")
+
+            // Set up text rendering similar to logo rendering
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE3)
+            GlUtils.checkGlError("glActiveTexture")
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, text2TextureId)
+            GlUtils.checkGlError("glBindTexture text")
+
+            val uTextTextureLoc = GLES20.glGetUniformLocation(text2ProgramHandle, "sTexture")
+            if (uTextTextureLoc != -1) {
+                GLES20.glUniform1i(uTextTextureLoc, 2)
+                GlUtils.checkGlError("glUniform1i")
+            }
+            val textMvpMatrix = FloatArray(16)
+            Matrix.setIdentityM(textMvpMatrix, 0)
+            Matrix.translateM(textMvpMatrix, 0, -0.7f, 0.8f, 0f)  // Top-left corner
+            Matrix.scaleM(textMvpMatrix, 0, 0.25f, 0.1f, 1f)  // Scale to appropriate size
+
+            GLES20.glUniformMatrix4fv(uText2MVPMatrixLoc, 1, false, textMvpMatrix, 0)
+
+            GLES20.glEnableVertexAttribArray(aText2PositionLoc)
+            GlUtils.checkGlError("glEnableVertexAttribArray text position")
+            GLES20.glVertexAttribPointer(aText2PositionLoc, 2, GLES20.GL_FLOAT, false, 0, logoVertexBuffer)
+            GlUtils.checkGlError("glVertexAttribPointer text position")
+
+            GLES20.glEnableVertexAttribArray(aText2TextureCoordLoc)
+            GlUtils.checkGlError("glEnableVertexAttribArray text texture")
+            GLES20.glVertexAttribPointer(aText2TextureCoordLoc, 2, GLES20.GL_FLOAT, false, 0, logoTexBuffer)
+            GlUtils.checkGlError("glVertexAttribPointer text texture")
+
+            GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
+            GlUtils.checkGlError("glDrawArrays text")
+        }
+
         GLES20.glDisable(GLES20.GL_BLEND)
         GlUtils.checkGlError("glDisable GL_BLEND")
 
@@ -368,6 +429,8 @@ class Texture2DProgram {
         GLES20.glDisableVertexAttribArray(aLogoTextureCoordLoc)
         GLES20.glDisableVertexAttribArray(aTextPositionLoc)
         GLES20.glDisableVertexAttribArray(aTextTextureCoordLoc)
+        GLES20.glDisableVertexAttribArray(aText2PositionLoc)
+        GLES20.glDisableVertexAttribArray(aText2TextureCoordLoc)
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, 0)
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0)
         GLES20.glUseProgram(0)
@@ -439,8 +502,10 @@ class Texture2DProgram {
 
     companion object {
 
-        var SCORE = ""
-        var OLD_SCORE = ""
+        var TEXT1 = ""
+        var OLD_TEXT1 = ""
+        var TEXT2 = ""
+        var OLD_TEXT2 = ""
 
         // Simple vertex shader, used for all programs.
         private const val VERTEX_SHADER = """uniform mat4 uMVPMatrix;
