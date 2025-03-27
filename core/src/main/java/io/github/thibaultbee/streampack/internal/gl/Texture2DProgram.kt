@@ -277,7 +277,10 @@ class Texture2DProgram {
         context: Context,
         mvpMatrix: FloatArray, vertexBuffer: FloatBuffer, logoVertexBuffer: FloatBuffer, firstVertex: Int,
         vertexCount: Int, coordsPerVertex: Int, vertexStride: Int,
-        texMatrix: FloatArray, texBuffer: FloatBuffer, logoTexBuffer: FloatBuffer, textureId: Int, texStride: Int
+        texMatrix: FloatArray, texBuffer: FloatBuffer, logoTexBuffer: FloatBuffer, textureId: Int, texStride: Int,
+        textVertexBuffer: FloatBuffer, textTexBuffer: FloatBuffer,
+        text2VertexBuffer: FloatBuffer, text2TexBuffer: FloatBuffer,
+        text3VertexBuffer: FloatBuffer, text3TexBuffer: FloatBuffer,
     ) {
         GlUtils.checkGlError("draw start")
 
@@ -386,12 +389,12 @@ class Texture2DProgram {
 
             GLES20.glEnableVertexAttribArray(aTextPositionLoc)
             GlUtils.checkGlError("glEnableVertexAttribArray text position")
-            GLES20.glVertexAttribPointer(aTextPositionLoc, 2, GLES20.GL_FLOAT, false, 0, logoVertexBuffer)
+            GLES20.glVertexAttribPointer(aTextPositionLoc, 2, GLES20.GL_FLOAT, false, 0, textVertexBuffer)
             GlUtils.checkGlError("glVertexAttribPointer text position")
 
             GLES20.glEnableVertexAttribArray(aTextTextureCoordLoc)
             GlUtils.checkGlError("glEnableVertexAttribArray text texture")
-            GLES20.glVertexAttribPointer(aTextTextureCoordLoc, 2, GLES20.GL_FLOAT, false, 0, logoTexBuffer)
+            GLES20.glVertexAttribPointer(aTextTextureCoordLoc, 2, GLES20.GL_FLOAT, false, 0, textTexBuffer)
             GlUtils.checkGlError("glVertexAttribPointer text texture")
 
             GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
@@ -427,12 +430,12 @@ class Texture2DProgram {
 
             GLES20.glEnableVertexAttribArray(aText2PositionLoc)
             GlUtils.checkGlError("glEnableVertexAttribArray text position")
-            GLES20.glVertexAttribPointer(aText2PositionLoc, 2, GLES20.GL_FLOAT, false, 0, logoVertexBuffer)
+            GLES20.glVertexAttribPointer(aText2PositionLoc, 2, GLES20.GL_FLOAT, false, 0, text2VertexBuffer)
             GlUtils.checkGlError("glVertexAttribPointer text position")
 
             GLES20.glEnableVertexAttribArray(aText2TextureCoordLoc)
             GlUtils.checkGlError("glEnableVertexAttribArray text texture")
-            GLES20.glVertexAttribPointer(aText2TextureCoordLoc, 2, GLES20.GL_FLOAT, false, 0, logoTexBuffer)
+            GLES20.glVertexAttribPointer(aText2TextureCoordLoc, 2, GLES20.GL_FLOAT, false, 0, text2TexBuffer)
             GlUtils.checkGlError("glVertexAttribPointer text texture")
 
             GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
@@ -468,12 +471,12 @@ class Texture2DProgram {
 
             GLES20.glEnableVertexAttribArray(aText3PositionLoc)
             GlUtils.checkGlError("glEnableVertexAttribArray text position")
-            GLES20.glVertexAttribPointer(aText3PositionLoc, 2, GLES20.GL_FLOAT, false, 0, logoVertexBuffer)
+            GLES20.glVertexAttribPointer(aText3PositionLoc, 2, GLES20.GL_FLOAT, false, 0, text3VertexBuffer)
             GlUtils.checkGlError("glVertexAttribPointer text position")
 
             GLES20.glEnableVertexAttribArray(aText3TextureCoordLoc)
             GlUtils.checkGlError("glEnableVertexAttribArray text texture")
-            GLES20.glVertexAttribPointer(aText3TextureCoordLoc, 2, GLES20.GL_FLOAT, false, 0, logoTexBuffer)
+            GLES20.glVertexAttribPointer(aText3TextureCoordLoc, 2, GLES20.GL_FLOAT, false, 0, text3TexBuffer)
             GlUtils.checkGlError("glVertexAttribPointer text texture")
 
             GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)

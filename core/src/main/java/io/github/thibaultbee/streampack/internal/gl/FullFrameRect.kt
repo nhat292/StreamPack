@@ -90,6 +90,48 @@ class FullFrameRect(var program: Texture2DProgram) {
                 position(0)
             }
 
+        private val FULL_RECTANGLE_BUF_TEXT: FloatBuffer = ByteBuffer.allocateDirect(FULL_RECTANGLE_COORDS_LOGO.size * 4)
+            .order(ByteOrder.nativeOrder())
+            .asFloatBuffer().apply {
+                put(FULL_RECTANGLE_COORDS_LOGO)
+                position(0)
+            }
+
+        private val FULL_RECTANGLE_TEX_BUF_TEXT: FloatBuffer = ByteBuffer.allocateDirect(LOGO_TEX_COORDS.size * 4)
+            .order(ByteOrder.nativeOrder())
+            .asFloatBuffer().apply {
+                put(LOGO_TEX_COORDS)
+                position(0)
+            }
+
+        private val FULL_RECTANGLE_BUF_TEXT2: FloatBuffer = ByteBuffer.allocateDirect(FULL_RECTANGLE_COORDS_LOGO.size * 4)
+            .order(ByteOrder.nativeOrder())
+            .asFloatBuffer().apply {
+                put(FULL_RECTANGLE_COORDS_LOGO)
+                position(0)
+            }
+
+        private val FULL_RECTANGLE_TEX_BUF_TEXT2: FloatBuffer = ByteBuffer.allocateDirect(LOGO_TEX_COORDS.size * 4)
+            .order(ByteOrder.nativeOrder())
+            .asFloatBuffer().apply {
+                put(LOGO_TEX_COORDS)
+                position(0)
+            }
+
+        private val FULL_RECTANGLE_BUF_TEXT3: FloatBuffer = ByteBuffer.allocateDirect(FULL_RECTANGLE_COORDS_LOGO.size * 4)
+            .order(ByteOrder.nativeOrder())
+            .asFloatBuffer().apply {
+                put(FULL_RECTANGLE_COORDS_LOGO)
+                position(0)
+            }
+
+        private val FULL_RECTANGLE_TEX_BUF_TEXT3: FloatBuffer = ByteBuffer.allocateDirect(LOGO_TEX_COORDS.size * 4)
+            .order(ByteOrder.nativeOrder())
+            .asFloatBuffer().apply {
+                put(LOGO_TEX_COORDS)
+                position(0)
+            }
+
         /**
          * Allocates a direct float buffer, and populates it with the float array data.
          */
@@ -156,7 +198,10 @@ class FullFrameRect(var program: Texture2DProgram) {
             context,
             mvpMatrix, FULL_RECTANGLE_BUF, FULL_RECTANGLE_BUF_LOGO, 0,
             4, 2, 2 * Float.SIZE_BYTES,
-            texMatrix, FULL_RECTANGLE_TEX_BUF, FULL_RECTANGLE_TEX_BUF_LOGO, textureId, 2 * Float.SIZE_BYTES
+            texMatrix, FULL_RECTANGLE_TEX_BUF, FULL_RECTANGLE_TEX_BUF_LOGO, textureId, 2 * Float.SIZE_BYTES,
+            FULL_RECTANGLE_BUF_TEXT, FULL_RECTANGLE_TEX_BUF_TEXT,
+            FULL_RECTANGLE_BUF_TEXT2, FULL_RECTANGLE_TEX_BUF_TEXT2,
+            FULL_RECTANGLE_BUF_TEXT3, FULL_RECTANGLE_TEX_BUF_TEXT3
         )
     }
 }
