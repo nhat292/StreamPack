@@ -392,11 +392,11 @@ class Texture2DProgram {
                 GlUtils.checkGlError("glUniform1i")
             }
             val horizontalScale = 0.02f * TEXT1.length
-            val halfTextWidth = ((textWidth / 2) / screenWidth) * horizontalScale
+            val halfTextWidth = textWidth / screenWidth
             val verticalScale = 0.1f  // Keep vertical scale more consistent
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
-            Matrix.translateM(textMvpMatrix, 0, -0.7f + halfTextWidth, 0.8f, 0f)  // Top-left corner
+            Matrix.translateM(textMvpMatrix, 0, -0.7f + halfTextWidth, 0.83f, 0f)  // Top-left corner
             Matrix.scaleM(textMvpMatrix, 0, horizontalScale, verticalScale, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uTextMVPMatrixLoc, 1, false, textMvpMatrix, 0)
@@ -438,11 +438,11 @@ class Texture2DProgram {
                 GlUtils.checkGlError("glUniform1i")
             }
             val horizontalScale = 0.02f * TEXT2.length
-            val halfTextWidth = ((text2Width / 2) / screenWidth) * horizontalScale
+            val halfTextWidth = text2Width / screenWidth
             val verticalScale = 0.1f  // Keep vertical scale more consistent
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
-            Matrix.translateM(textMvpMatrix, 0, -0.7f + halfTextWidth, 0.7f, 0f)  // Top-left corner
+            Matrix.translateM(textMvpMatrix, 0, -0.7f + halfTextWidth, 0.76f, 0f)  // Top-left corner
             Matrix.scaleM(textMvpMatrix, 0, horizontalScale, verticalScale, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uText2MVPMatrixLoc, 1, false, textMvpMatrix, 0)
@@ -484,7 +484,7 @@ class Texture2DProgram {
                 GlUtils.checkGlError("glUniform1i")
             }
             val horizontalScale = 0.02f * TEXT3.length
-            val halfTextWidth = ((text3Width / 2) / screenWidth) * horizontalScale
+            val halfTextWidth = text3Width / screenWidth
             val verticalScale = 0.1f  // Keep vertical scale more consistent
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
