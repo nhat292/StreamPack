@@ -383,7 +383,7 @@ class Texture2DProgram {
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
             Matrix.translateM(textMvpMatrix, 0, -0.7f, 0.8f, 0f)  // Top-left corner
-            Matrix.scaleM(textMvpMatrix, 0, 0.25f, 0.1f, 1f)  // Scale to appropriate size
+            Matrix.scaleM(textMvpMatrix, 0, 1.0f, 1.0f, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uTextMVPMatrixLoc, 1, false, textMvpMatrix, 0)
 
@@ -424,7 +424,7 @@ class Texture2DProgram {
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
             Matrix.translateM(textMvpMatrix, 0, -0.7f, 0.7f, 0f)  // Top-left corner
-            Matrix.scaleM(textMvpMatrix, 0, 0.25f, 0.1f, 1f)  // Scale to appropriate size
+            Matrix.scaleM(textMvpMatrix, 0, 1.0f, 1.0f, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uText2MVPMatrixLoc, 1, false, textMvpMatrix, 0)
 
@@ -465,7 +465,7 @@ class Texture2DProgram {
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
             Matrix.translateM(textMvpMatrix, 0, -0.7f, 0.9f, 0f)  // Top-left corner
-            Matrix.scaleM(textMvpMatrix, 0, 0.25f, 0.1f, 1f)  // Scale to appropriate size
+            Matrix.scaleM(textMvpMatrix, 0, 1.0f, 1.0f, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uText3MVPMatrixLoc, 1, false, textMvpMatrix, 0)
 
@@ -539,14 +539,15 @@ class Texture2DProgram {
         // Measure text dimensions
         val textBounds = Rect()
         paint.getTextBounds(text, 0, text.length, textBounds)
-        val width = textBounds.width() + 8  // Add padding
-        val height = textBounds.height() + 8  // Add padding
+        val charWidthEstimate = paint.measureText(text)
+        val width = charWidthEstimate.toInt() + 16  // Add padding
+        val height = textBounds.height() + 16  // Add padding
 
         // Create a bitmap and draw text on it
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
-        canvas.drawText(text, 4f, height - 4f - textBounds.bottom, paint)
+        canvas.drawText(text, 8f, height - 8f - textBounds.bottom, paint)
 
         // Create an OpenGL texture
         val textureHandle = IntArray(1)
