@@ -566,10 +566,10 @@ class Texture2DProgram {
         val viewport = IntArray(4)
         GLES20.glGetIntegerv(GLES20.GL_VIEWPORT, viewport, 0)
         val screenWidth = viewport[2]
-        val bitmap = Bitmap.createBitmap(screenWidth, height, Bitmap.Config.ARGB_8888)
+        val bitmap = Bitmap.createBitmap(500, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
-        canvas.drawColor(Color.RED, PorterDuff.Mode.CLEAR)
-        canvas.drawText(text, 20f, height - 8f - textBounds.bottom, paint)
+        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
+        canvas.drawText(text, 0f, height - 8f - textBounds.bottom, paint)
 
         // Create an OpenGL texture
         val textureHandle = IntArray(1)
