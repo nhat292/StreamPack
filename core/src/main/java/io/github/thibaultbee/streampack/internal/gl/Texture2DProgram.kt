@@ -380,11 +380,7 @@ class Texture2DProgram {
                 GLES20.glUniform1i(uTextTextureLoc, 2)
                 GlUtils.checkGlError("glUniform1i")
             }
-
-            val textLength = TEXT1.length
-            val baseScale = 0.2f  // Base scale factor
-            val lengthScale = 1f / (1f + textLength * 0.05f)  // Decreases scale for longer texts
-            val horizontalScale = baseScale * lengthScale
+            val horizontalScale = 0.2f
             val verticalScale = 0.1f  // Keep vertical scale more consistent
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
@@ -427,10 +423,7 @@ class Texture2DProgram {
                 GLES20.glUniform1i(uTextTextureLoc, 3)
                 GlUtils.checkGlError("glUniform1i")
             }
-            val textLength = TEXT2.length
-            val baseScale = 0.2f  // Base scale factor
-            val lengthScale = 1f / (1f + textLength * 0.05f)  // Decreases scale for longer texts
-            val horizontalScale = baseScale * lengthScale
+            val horizontalScale = 0.2f
             val verticalScale = 0.1f  // Keep vertical scale more consistent
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
@@ -473,10 +466,7 @@ class Texture2DProgram {
                 GLES20.glUniform1i(uTextTextureLoc, 4)
                 GlUtils.checkGlError("glUniform1i")
             }
-            val textLength = TEXT3.length
-            val baseScale = 0.2f  // Base scale factor
-            val lengthScale = 1f / (1f + textLength * 0.05f)  // Decreases scale for longer texts
-            val horizontalScale = baseScale * lengthScale
+            val horizontalScale = 0.2f
             val verticalScale = 0.1f  // Keep vertical scale more consistent
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
