@@ -368,11 +368,9 @@ class Texture2DProgram {
 
         // Create text
 
-        val screenWidth = context.resources.displayMetrics.widthPixels
-
         if (TEXT1.isNotEmpty()) {
             if (textTextureId == -1 || OLD_TEXT1 != TEXT1) {
-                val (id, width) = createTextTexture(TEXT1, 15f, Color.WHITE)
+                val (id, width) = createTextTexture(context, TEXT1, 15f, Color.WHITE)
                 textTextureId = id
                 textWidth = width
                 OLD_TEXT1 = TEXT1
@@ -392,11 +390,10 @@ class Texture2DProgram {
                 GlUtils.checkGlError("glUniform1i")
             }
             val horizontalScale = 0.02f * TEXT1.length
-            val halfTextWidth = textWidth / screenWidth
             val verticalScale = 0.1f  // Keep vertical scale more consistent
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
-            Matrix.translateM(textMvpMatrix, 0, -0.7f + halfTextWidth, 0.83f, 0f)  // Top-left corner
+            Matrix.translateM(textMvpMatrix, 0, -0.5f, 0.83f, 0f)  // Top-left corner
             Matrix.scaleM(textMvpMatrix, 0, horizontalScale, verticalScale, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uTextMVPMatrixLoc, 1, false, textMvpMatrix, 0)
@@ -418,7 +415,7 @@ class Texture2DProgram {
         // Create text
         if (TEXT2.isNotEmpty()) {
             if (text2TextureId == -1 || OLD_TEXT2 != TEXT2) {
-                val (id, width)  = createTextTexture(TEXT2, 15f, Color.WHITE)
+                val (id, width)  = createTextTexture(context, TEXT2, 15f, Color.WHITE)
                 text2TextureId = id
                 text2Width = width
                 OLD_TEXT2 = TEXT2
@@ -438,11 +435,10 @@ class Texture2DProgram {
                 GlUtils.checkGlError("glUniform1i")
             }
             val horizontalScale = 0.02f * TEXT2.length
-            val halfTextWidth = text2Width / screenWidth
             val verticalScale = 0.1f  // Keep vertical scale more consistent
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
-            Matrix.translateM(textMvpMatrix, 0, -0.7f + halfTextWidth, 0.76f, 0f)  // Top-left corner
+            Matrix.translateM(textMvpMatrix, 0, -0.5f, 0.76f, 0f)  // Top-left corner
             Matrix.scaleM(textMvpMatrix, 0, horizontalScale, verticalScale, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uText2MVPMatrixLoc, 1, false, textMvpMatrix, 0)
@@ -464,7 +460,7 @@ class Texture2DProgram {
         // Create text
         if (TEXT3.isNotEmpty()) {
             if (text3TextureId == -1 || OLD_TEXT3 != TEXT3) {
-                val (id, width) = createTextTexture(TEXT3, 15f, Color.WHITE)
+                val (id, width) = createTextTexture(context, TEXT3, 15f, Color.WHITE)
                 text3TextureId = id
                 text3Width = width
                 OLD_TEXT3 = TEXT3
@@ -484,11 +480,10 @@ class Texture2DProgram {
                 GlUtils.checkGlError("glUniform1i")
             }
             val horizontalScale = 0.02f * TEXT3.length
-            val halfTextWidth = text3Width / screenWidth
             val verticalScale = 0.1f  // Keep vertical scale more consistent
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
-            Matrix.translateM(textMvpMatrix, 0, -0.7f + halfTextWidth, 0.9f, 0f)  // Top-left corner
+            Matrix.translateM(textMvpMatrix, 0, -0.5f, 0.9f, 0f)  // Top-left corner
             Matrix.scaleM(textMvpMatrix, 0, horizontalScale, verticalScale, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uText3MVPMatrixLoc, 1, false, textMvpMatrix, 0)
@@ -550,7 +545,7 @@ class Texture2DProgram {
         return textureHandle[0]
     }
 
-    private fun createTextTexture(text: String, size: Float, textColor: Int): Pair<Int, Int>  {
+    private fun createTextTexture(context: Context, text: String, size: Float, textColor: Int): Pair<Int, Int>  {
         // Create a bitmap with room for the text
         val paint = Paint().apply {
             textSize = size
@@ -568,10 +563,13 @@ class Texture2DProgram {
         val height = textBounds.height() + 16  // Add padding
 
         // Create a bitmap and draw text on it
-        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val widthPixels = context.resources.displayMetrics.widthPixels
+        val heightPixels = context.resources.displayMetrics.heightPixels
+        val screenWidth = if (widthPixels > heightPixels) widthPixels else heightPixels
+        val bitmap = Bitmap.createBitmap(screenWidth, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
-        canvas.drawText(text, 8f, height - 8f - textBounds.bottom, paint)
+        canvas.drawText(text, 20f, height - 8f - textBounds.bottom, paint)
 
         // Create an OpenGL texture
         val textureHandle = IntArray(1)
