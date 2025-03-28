@@ -563,9 +563,9 @@ class Texture2DProgram {
         val height = textBounds.height() + 16  // Add padding
 
         // Create a bitmap and draw text on it
-        val widthPixels = context.resources.displayMetrics.widthPixels
-        val heightPixels = context.resources.displayMetrics.heightPixels
-        val screenWidth = if (widthPixels > heightPixels) widthPixels else heightPixels
+        val viewport = IntArray(4)
+        GLES20.glGetIntegerv(GLES20.GL_VIEWPORT, viewport, 0)
+        val screenWidth = viewport[2]
         val bitmap = Bitmap.createBitmap(screenWidth, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         canvas.drawColor(Color.RED, PorterDuff.Mode.CLEAR)
