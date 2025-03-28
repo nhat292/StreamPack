@@ -67,9 +67,15 @@ class Texture2DProgram {
     private val aText3TextureCoordLoc: Int
 
     private var logoTextureId: Int = -1
+
     private var textTextureId: Int = -1
+    private var textWidth: Int = 0
+
     private var text2TextureId: Int = -1
+    private var text2Width: Int = 0
+
     private var text3TextureId: Int = -1
+    private var text3Width: Int = 0
 
     init {
         programHandle = createProgram(VERTEX_SHADER, FRAGMENT_SHADER_EXT)
@@ -361,9 +367,14 @@ class Texture2DProgram {
         GlUtils.checkGlError("glDrawArrays logo")
 
         // Create text
+
+        val screenWidth = context.resources.displayMetrics.widthPixels
+
         if (TEXT1.isNotEmpty()) {
             if (textTextureId == -1 || OLD_TEXT1 != TEXT1) {
-                textTextureId = createTextTexture(TEXT1, 15f, Color.WHITE)
+                val (id, width) = createTextTexture(TEXT1, 15f, Color.WHITE)
+                textTextureId = id
+                textWidth = width
                 OLD_TEXT1 = TEXT1
             }
             GLES20.glUseProgram(textProgramHandle)
@@ -381,10 +392,11 @@ class Texture2DProgram {
                 GlUtils.checkGlError("glUniform1i")
             }
             val horizontalScale = 0.02f * TEXT1.length
+            val halfTextWidth = ((textWidth / 2) / screenWidth) * horizontalScale
             val verticalScale = 0.1f  // Keep vertical scale more consistent
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
-            Matrix.translateM(textMvpMatrix, 0, -0.7f, 0.8f, 0f)  // Top-left corner
+            Matrix.translateM(textMvpMatrix, 0, -0.7f + halfTextWidth, 0.8f, 0f)  // Top-left corner
             Matrix.scaleM(textMvpMatrix, 0, horizontalScale, verticalScale, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uTextMVPMatrixLoc, 1, false, textMvpMatrix, 0)
@@ -406,7 +418,9 @@ class Texture2DProgram {
         // Create text
         if (TEXT2.isNotEmpty()) {
             if (text2TextureId == -1 || OLD_TEXT2 != TEXT2) {
-                text2TextureId = createTextTexture(TEXT2, 15f, Color.WHITE)
+                val (id, width)  = createTextTexture(TEXT2, 15f, Color.WHITE)
+                text2TextureId = id
+                text2Width = width
                 OLD_TEXT2 = TEXT2
             }
             GLES20.glUseProgram(text2ProgramHandle)
@@ -424,10 +438,11 @@ class Texture2DProgram {
                 GlUtils.checkGlError("glUniform1i")
             }
             val horizontalScale = 0.02f * TEXT2.length
+            val halfTextWidth = ((text2Width / 2) / screenWidth) * horizontalScale
             val verticalScale = 0.1f  // Keep vertical scale more consistent
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
-            Matrix.translateM(textMvpMatrix, 0, -0.7f, 0.7f, 0f)  // Top-left corner
+            Matrix.translateM(textMvpMatrix, 0, -0.7f + halfTextWidth, 0.7f, 0f)  // Top-left corner
             Matrix.scaleM(textMvpMatrix, 0, horizontalScale, verticalScale, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uText2MVPMatrixLoc, 1, false, textMvpMatrix, 0)
@@ -449,7 +464,9 @@ class Texture2DProgram {
         // Create text
         if (TEXT3.isNotEmpty()) {
             if (text3TextureId == -1 || OLD_TEXT3 != TEXT3) {
-                text3TextureId = createTextTexture(TEXT3, 15f, Color.WHITE)
+                val (id, width) = createTextTexture(TEXT3, 15f, Color.WHITE)
+                text3TextureId = id
+                text3Width = width
                 OLD_TEXT3 = TEXT3
             }
             GLES20.glUseProgram(text3ProgramHandle)
@@ -467,10 +484,11 @@ class Texture2DProgram {
                 GlUtils.checkGlError("glUniform1i")
             }
             val horizontalScale = 0.02f * TEXT3.length
+            val halfTextWidth = ((text3Width / 2) / screenWidth) * horizontalScale
             val verticalScale = 0.1f  // Keep vertical scale more consistent
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
-            Matrix.translateM(textMvpMatrix, 0, -0.7f, 0.9f, 0f)  // Top-left corner
+            Matrix.translateM(textMvpMatrix, 0, -0.7f + halfTextWidth, 0.9f, 0f)  // Top-left corner
             Matrix.scaleM(textMvpMatrix, 0, horizontalScale, verticalScale, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uText3MVPMatrixLoc, 1, false, textMvpMatrix, 0)
@@ -532,7 +550,7 @@ class Texture2DProgram {
         return textureHandle[0]
     }
 
-    private fun createTextTexture(text: String, size: Float, textColor: Int): Int {
+    private fun createTextTexture(text: String, size: Float, textColor: Int): Pair<Int, Int>  {
         // Create a bitmap with room for the text
         val paint = Paint().apply {
             textSize = size
@@ -570,7 +588,7 @@ class Texture2DProgram {
         // Clean up
         bitmap.recycle()
 
-        return textureHandle[0]
+        return textureHandle[0] to width
     }
 
     companion object {
