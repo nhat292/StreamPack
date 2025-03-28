@@ -418,7 +418,7 @@ class Texture2DProgram {
 
             val uTextTextureLoc = GLES20.glGetUniformLocation(text2ProgramHandle, "sTexture")
             if (uTextTextureLoc != -1) {
-                GLES20.glUniform1i(uTextTextureLoc, 2)
+                GLES20.glUniform1i(uTextTextureLoc, 3)
                 GlUtils.checkGlError("glUniform1i")
             }
             val textMvpMatrix = FloatArray(16)
@@ -459,7 +459,7 @@ class Texture2DProgram {
 
             val uTextTextureLoc = GLES20.glGetUniformLocation(text3ProgramHandle, "sTexture")
             if (uTextTextureLoc != -1) {
-                GLES20.glUniform1i(uTextTextureLoc, 2)
+                GLES20.glUniform1i(uTextTextureLoc, 4)
                 GlUtils.checkGlError("glUniform1i")
             }
             val textMvpMatrix = FloatArray(16)
