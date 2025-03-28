@@ -568,7 +568,7 @@ class Texture2DProgram {
         val screenWidth = if (widthPixels > heightPixels) widthPixels else heightPixels
         val bitmap = Bitmap.createBitmap(screenWidth, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
-        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
+        canvas.drawColor(Color.RED, PorterDuff.Mode.CLEAR)
         canvas.drawText(text, 20f, height - 8f - textBounds.bottom, paint)
 
         // Create an OpenGL texture
