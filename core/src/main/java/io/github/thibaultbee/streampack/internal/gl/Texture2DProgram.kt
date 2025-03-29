@@ -69,13 +69,13 @@ class Texture2DProgram {
     private var logoTextureId: Int = -1
 
     private var textTextureId: Int = -1
-    private var textWidth: Int = 0
+    private var textRatio: Float = 0f
 
     private var text2TextureId: Int = -1
-    private var text2Width: Int = 0
+    private var text2Ratio: Float = 0f
 
     private var text3TextureId: Int = -1
-    private var text3Width: Int = 0
+    private var text3Ratio: Float = 0f
 
     init {
         programHandle = createProgram(VERTEX_SHADER, FRAGMENT_SHADER_EXT)
@@ -370,9 +370,9 @@ class Texture2DProgram {
 
         if (TEXT1.isNotEmpty()) {
             if (textTextureId == -1 || OLD_TEXT1 != TEXT1) {
-                val (id, width) = createTextTexture(context, TEXT1, 30f, Color.WHITE)
+                val (id, ratio) = createTextTexture(context, TEXT1, 30f, Color.WHITE)
                 textTextureId = id
-                textWidth = width
+                textRatio = ratio
                 OLD_TEXT1 = TEXT1
             }
             GLES20.glUseProgram(textProgramHandle)
@@ -394,7 +394,7 @@ class Texture2DProgram {
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
             Matrix.translateM(textMvpMatrix, 0, 0f, 0.83f, 0f)  // Top-left corner
-            Matrix.scaleM(textMvpMatrix, 0, horizontalScale, verticalScale, 1f)  // Scale to appropriate size
+            Matrix.scaleM(textMvpMatrix, 0, horizontalScale * textRatio, verticalScale, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uTextMVPMatrixLoc, 1, false, textMvpMatrix, 0)
 
@@ -415,9 +415,9 @@ class Texture2DProgram {
         // Create text
         if (TEXT2.isNotEmpty()) {
             if (text2TextureId == -1 || OLD_TEXT2 != TEXT2) {
-                val (id, width)  = createTextTexture(context, TEXT2, 30f, Color.WHITE)
+                val (id, ratio)  = createTextTexture(context, TEXT2, 30f, Color.WHITE)
                 text2TextureId = id
-                text2Width = width
+                text2Ratio = ratio
                 OLD_TEXT2 = TEXT2
             }
             GLES20.glUseProgram(text2ProgramHandle)
@@ -439,7 +439,7 @@ class Texture2DProgram {
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
             Matrix.translateM(textMvpMatrix, 0, 0f, 0.76f, 0f)  // Top-left corner
-            Matrix.scaleM(textMvpMatrix, 0, horizontalScale, verticalScale, 1f)  // Scale to appropriate size
+            Matrix.scaleM(textMvpMatrix, 0, horizontalScale * text2Ratio, verticalScale, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uText2MVPMatrixLoc, 1, false, textMvpMatrix, 0)
 
@@ -460,9 +460,9 @@ class Texture2DProgram {
         // Create text
         if (TEXT3.isNotEmpty()) {
             if (text3TextureId == -1 || OLD_TEXT3 != TEXT3) {
-                val (id, width) = createTextTexture(context, TEXT3, 30f, Color.WHITE)
+                val (id, ratio) = createTextTexture(context, TEXT3, 30f, Color.WHITE)
                 text3TextureId = id
-                text3Width = width
+                text3Ratio = ratio
                 OLD_TEXT3 = TEXT3
             }
             GLES20.glUseProgram(text3ProgramHandle)
@@ -484,7 +484,7 @@ class Texture2DProgram {
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
             Matrix.translateM(textMvpMatrix, 0, 0f, 0.9f, 0f)  // Top-left corner
-            Matrix.scaleM(textMvpMatrix, 0, horizontalScale, verticalScale, 1f)  // Scale to appropriate size
+            Matrix.scaleM(textMvpMatrix, 0, horizontalScale * text3Ratio, verticalScale, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uText3MVPMatrixLoc, 1, false, textMvpMatrix, 0)
 
@@ -545,7 +545,7 @@ class Texture2DProgram {
         return textureHandle[0]
     }
 
-    private fun createTextTexture(context: Context, text: String, size: Float, textColor: Int): Pair<Int, Int>  {
+    private fun createTextTexture(context: Context, text: String, size: Float, textColor: Int): Pair<Int, Float>  {
         // Create a bitmap with room for the text
         val paint = Paint().apply {
             textSize = size
@@ -582,7 +582,7 @@ class Texture2DProgram {
         // Clean up
         bitmap.recycle()
 
-        return Pair(textureHandle[0], width)
+        return Pair(textureHandle[0], (width / height).toFloat())
     }
 
     companion object {
