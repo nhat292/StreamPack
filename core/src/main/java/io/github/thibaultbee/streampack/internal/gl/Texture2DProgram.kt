@@ -370,7 +370,7 @@ class Texture2DProgram {
 
         if (TEXT1.isNotEmpty()) {
             if (textTextureId == -1 || OLD_TEXT1 != TEXT1) {
-                val (id, width) = createTextTexture(context, TEXT1, 4f, Color.WHITE)
+                val (id, width) = createTextTexture(context, TEXT1, 30f, Color.WHITE)
                 textTextureId = id
                 textWidth = width
                 OLD_TEXT1 = TEXT1
@@ -389,8 +389,8 @@ class Texture2DProgram {
                 GLES20.glUniform1i(uTextTextureLoc, 2)
                 GlUtils.checkGlError("glUniform1i")
             }
-            val horizontalScale = 1f
-            val verticalScale = 1f  // Keep vertical scale more consistent
+            val horizontalScale = 0.2f
+            val verticalScale = 0.2f  // Keep vertical scale more consistent
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
             Matrix.translateM(textMvpMatrix, 0, 0f, 0.83f, 0f)  // Top-left corner
@@ -415,7 +415,7 @@ class Texture2DProgram {
         // Create text
         if (TEXT2.isNotEmpty()) {
             if (text2TextureId == -1 || OLD_TEXT2 != TEXT2) {
-                val (id, width)  = createTextTexture(context, TEXT2, 4f, Color.WHITE)
+                val (id, width)  = createTextTexture(context, TEXT2, 30f, Color.WHITE)
                 text2TextureId = id
                 text2Width = width
                 OLD_TEXT2 = TEXT2
@@ -434,8 +434,8 @@ class Texture2DProgram {
                 GLES20.glUniform1i(uTextTextureLoc, 3)
                 GlUtils.checkGlError("glUniform1i")
             }
-            val horizontalScale = 1f
-            val verticalScale = 1f  // Keep vertical scale more consistent
+            val horizontalScale = 0.2f
+            val verticalScale = 0.2f  // Keep vertical scale more consistent
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
             Matrix.translateM(textMvpMatrix, 0, 0f, 0.76f, 0f)  // Top-left corner
@@ -460,7 +460,7 @@ class Texture2DProgram {
         // Create text
         if (TEXT3.isNotEmpty()) {
             if (text3TextureId == -1 || OLD_TEXT3 != TEXT3) {
-                val (id, width) = createTextTexture(context, TEXT3, 4f, Color.WHITE)
+                val (id, width) = createTextTexture(context, TEXT3, 30f, Color.WHITE)
                 text3TextureId = id
                 text3Width = width
                 OLD_TEXT3 = TEXT3
@@ -479,8 +479,8 @@ class Texture2DProgram {
                 GLES20.glUniform1i(uTextTextureLoc, 4)
                 GlUtils.checkGlError("glUniform1i")
             }
-            val horizontalScale = 1f
-            val verticalScale = 1f  // Keep vertical scale more consistent
+            val horizontalScale = 0.2f
+            val verticalScale = 0.2f  // Keep vertical scale more consistent
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
             Matrix.translateM(textMvpMatrix, 0, 0f, 0.9f, 0f)  // Top-left corner
