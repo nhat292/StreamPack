@@ -629,6 +629,11 @@ class Texture2DProgram {
             textAlign = Paint.Align.LEFT
         }
 
+        val backgroundPaint = Paint().apply {
+            color = Color.BLUE
+            style = Paint.Style.FILL
+        }
+
         // Measure text dimensions
         val textBounds = Rect()
         paint.getTextBounds(text, 0, text.length, textBounds)
@@ -638,7 +643,8 @@ class Texture2DProgram {
         // Create a bitmap and draw text on it
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
-        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
+        canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), backgroundPaint)
+//        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
         canvas.drawText(text, 0f, height - 8f - textBounds.bottom, paint)
 
         // Create an OpenGL texture
