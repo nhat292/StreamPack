@@ -72,6 +72,7 @@ class Texture2DProgram {
     private val aText4TextureCoordLoc: Int
 
     private var logoTextureId: Int = -1
+    private var logoRatio: Float = 0f
 
     private var textTextureId: Int = -1
     private var textRatio: Float = 0f
@@ -346,7 +347,9 @@ class Texture2DProgram {
         GlUtils.checkGlError("glDisable GL_DEPTH_TEST")
 
         if (logoTextureId == -1) {
-            logoTextureId = getLogoResource(context, R.drawable.logo)
+            val (id, ratio) = getLogoResource(context, R.drawable.logo)
+            logoTextureId = id
+            logoRatio = ratio
             GlUtils.checkGlError("loadLogoTexture")
         }
 
@@ -367,10 +370,11 @@ class Texture2DProgram {
         }
 
         // Adjust Logo Position
+        val scale = 0.2f
         val logoMvpMatrix = FloatArray(16)
         Matrix.setIdentityM(logoMvpMatrix, 0)
         Matrix.translateM(logoMvpMatrix, 0, 0.85f, 0.85f, 0f) // Adjust position (top-right corner)
-        Matrix.scaleM(logoMvpMatrix, 0, 0.117f, 0.2f, 1f)  // Scale down logo
+        Matrix.scaleM(logoMvpMatrix, 0, scale * logoRatio, scale, 1f)  // Scale down logo
 
         GLES20.glUniformMatrix4fv(uLogoMVPMatrixLoc, 1, false, logoMvpMatrix, 0)
         GlUtils.checkGlError("glUniformMatrix4fv logo")
@@ -590,16 +594,18 @@ class Texture2DProgram {
         GLES20.glUseProgram(0)
     }
 
-    private fun getLogoResource(context: Context, resourceId: Int): Int {
+    private fun getLogoResource(context: Context, resourceId: Int): Pair<Int, Float> {
         val textureHandle = IntArray(1)
         GLES20.glGenTextures(1, textureHandle, 0)
-
+        var ratio = 1f
         if (textureHandle[0] != 0) {
             val options = BitmapFactory.Options()
             options.inScaled = false  // No pre-scaling
             options.inPreferredConfig = Bitmap.Config.ARGB_8888
 
             val bitmap = BitmapFactory.decodeResource(context.resources, resourceId, options) ?: throw RuntimeException("Error loading bitmap: resource not found")
+
+            ratio = (bitmap.width / bitmap.height).toFloat()
 
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0])
 
@@ -611,7 +617,7 @@ class Texture2DProgram {
             bitmap.recycle()
         }
 
-        return textureHandle[0]
+        return Pair(textureHandle[0], ratio)
     }
 
     private fun createTextTexture(context: Context, text: String, size: Float, textColor: Int): Pair<Int, Float>  {
