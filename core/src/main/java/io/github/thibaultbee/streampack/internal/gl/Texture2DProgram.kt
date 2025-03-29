@@ -419,7 +419,7 @@ class Texture2DProgram {
             val horizontalScale = scale * textRatio
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
-            Matrix.translateM(textMvpMatrix, 0, -0.8f + (horizontalScale / 2), 0.83f, 0f)  // Top-left corner
+            Matrix.translateM(textMvpMatrix, 0, -0.8f + (horizontalScale / 2), 0.85f, 0f)  // Top-left corner
             Matrix.scaleM(textMvpMatrix, 0, horizontalScale, scale, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uTextMVPMatrixLoc, 1, false, textMvpMatrix, 0)
@@ -464,7 +464,7 @@ class Texture2DProgram {
             val horizontalScale = scale * text2Ratio
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
-            Matrix.translateM(textMvpMatrix, 0, -0.8f + (horizontalScale / 2), 0.76f, 0f)  // Top-left corner
+            Matrix.translateM(textMvpMatrix, 0, -0.8f + (horizontalScale / 2), 0.7f, 0f)  // Top-left corner
             Matrix.scaleM(textMvpMatrix, 0, horizontalScale, scale, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uText2MVPMatrixLoc, 1, false, textMvpMatrix, 0)
@@ -554,7 +554,7 @@ class Texture2DProgram {
             val horizontalScale = scale * text4Ratio
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
-            Matrix.translateM(textMvpMatrix, 0, -0.8f + (horizontalScale / 2), 0.69f, 0f)  // Top-left corner
+            Matrix.translateM(textMvpMatrix, 0, -0.8f + (horizontalScale / 2), 0.65f, 0f)  // Top-left corner
             Matrix.scaleM(textMvpMatrix, 0, horizontalScale, scale, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uText4MVPMatrixLoc, 1, false, textMvpMatrix, 0)
