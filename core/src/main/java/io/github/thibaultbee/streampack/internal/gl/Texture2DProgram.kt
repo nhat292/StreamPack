@@ -370,7 +370,7 @@ class Texture2DProgram {
 
         if (TEXT1.isNotEmpty()) {
             if (textTextureId == -1 || OLD_TEXT1 != TEXT1) {
-                val (id, width) = createTextTexture(context, TEXT1, 10f, Color.WHITE)
+                val (id, width) = createTextTexture(context, TEXT1, 4f, Color.WHITE)
                 textTextureId = id
                 textWidth = width
                 OLD_TEXT1 = TEXT1
@@ -415,7 +415,7 @@ class Texture2DProgram {
         // Create text
         if (TEXT2.isNotEmpty()) {
             if (text2TextureId == -1 || OLD_TEXT2 != TEXT2) {
-                val (id, width)  = createTextTexture(context, TEXT2, 10f, Color.WHITE)
+                val (id, width)  = createTextTexture(context, TEXT2, 4f, Color.WHITE)
                 text2TextureId = id
                 text2Width = width
                 OLD_TEXT2 = TEXT2
@@ -460,7 +460,7 @@ class Texture2DProgram {
         // Create text
         if (TEXT3.isNotEmpty()) {
             if (text3TextureId == -1 || OLD_TEXT3 != TEXT3) {
-                val (id, width) = createTextTexture(context, TEXT3, 10f, Color.WHITE)
+                val (id, width) = createTextTexture(context, TEXT3, 4f, Color.WHITE)
                 text3TextureId = id
                 text3Width = width
                 OLD_TEXT3 = TEXT3
