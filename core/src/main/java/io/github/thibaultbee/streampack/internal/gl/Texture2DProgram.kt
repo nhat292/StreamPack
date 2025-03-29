@@ -370,7 +370,7 @@ class Texture2DProgram {
 
         if (TEXT1.isNotEmpty()) {
             if (textTextureId == -1 || OLD_TEXT1 != TEXT1) {
-                val (id, width) = createTextTexture(context, TEXT1, 5f, Color.WHITE)
+                val (id, width) = createTextTexture(context, TEXT1, 10f, Color.WHITE)
                 textTextureId = id
                 textWidth = width
                 OLD_TEXT1 = TEXT1
@@ -415,7 +415,7 @@ class Texture2DProgram {
         // Create text
         if (TEXT2.isNotEmpty()) {
             if (text2TextureId == -1 || OLD_TEXT2 != TEXT2) {
-                val (id, width)  = createTextTexture(context, TEXT2, 5f, Color.WHITE)
+                val (id, width)  = createTextTexture(context, TEXT2, 10f, Color.WHITE)
                 text2TextureId = id
                 text2Width = width
                 OLD_TEXT2 = TEXT2
@@ -460,7 +460,7 @@ class Texture2DProgram {
         // Create text
         if (TEXT3.isNotEmpty()) {
             if (text3TextureId == -1 || OLD_TEXT3 != TEXT3) {
-                val (id, width) = createTextTexture(context, TEXT3, 5f, Color.WHITE)
+                val (id, width) = createTextTexture(context, TEXT3, 10f, Color.WHITE)
                 text3TextureId = id
                 text3Width = width
                 OLD_TEXT3 = TEXT3
@@ -566,7 +566,7 @@ class Texture2DProgram {
         val viewport = IntArray(4)
         GLES20.glGetIntegerv(GLES20.GL_VIEWPORT, viewport, 0)
         val screenWidth = viewport[2]
-        val bitmap = Bitmap.createBitmap(500, height, Bitmap.Config.ARGB_8888)
+        val bitmap = Bitmap.createBitmap(screenWidth, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
         canvas.drawText(text, 0f, height - 8f - textBounds.bottom, paint)
@@ -586,7 +586,7 @@ class Texture2DProgram {
         // Clean up
         bitmap.recycle()
 
-        return textureHandle[0] to width
+        return Pair(textureHandle[0], screenWidth)
     }
 
     companion object {
