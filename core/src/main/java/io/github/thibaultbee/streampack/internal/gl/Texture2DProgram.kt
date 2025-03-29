@@ -486,7 +486,7 @@ class Texture2DProgram {
         // Create text
         if (TEXT3.isNotEmpty()) {
             if (text3TextureId == -1 || OLD_TEXT3 != TEXT3) {
-                val (id, ratio) = createTextTexture(context, TEXT3, 30f, Color.WHITE, getMaxLengthText())
+                val (id, ratio) = createTextTexture(context, TEXT3, 30f, Color.WHITE)
                 text3TextureId = id
                 text3Ratio = ratio
                 OLD_TEXT3 = TEXT3
@@ -636,7 +636,7 @@ class Texture2DProgram {
             isAntiAlias = true
         }
 
-        val borderWidth = 2f
+        val borderWidth = 4f
         val borderPaint = Paint().apply {
             color = Color.GREEN
             style = Paint.Style.STROKE
@@ -651,7 +651,7 @@ class Texture2DProgram {
             t = maxLengthText
         }
         paint.getTextBounds(t, 0, t.length, textBounds)
-        val padding = 8f
+        val padding = 14f
         val width = textBounds.width() + (padding * 2) + (borderWidth * 2)
         val height = textBounds.height() + (padding * 2) + (borderWidth * 2)
 
@@ -686,8 +686,8 @@ class Texture2DProgram {
         return Pair(textureHandle[0], (width / height).toFloat())
     }
 
-    fun getMaxLengthText(): String? {
-        val allTexts = listOf(TEXT1, TEXT2, TEXT3)
+    private fun getMaxLengthText(): String? {
+        val allTexts = listOf(TEXT1, TEXT2)
         return allTexts.maxByOrNull { it.length }
     }
 
