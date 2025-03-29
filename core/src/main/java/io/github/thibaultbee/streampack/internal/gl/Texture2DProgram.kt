@@ -395,7 +395,7 @@ class Texture2DProgram {
 
         if (TEXT1.isNotEmpty()) {
             if (textTextureId == -1 || OLD_TEXT1 != TEXT1) {
-                val (id, ratio) = createTextTexture(context, TEXT1, 30f, Color.WHITE)
+                val (id, ratio) = createTextTexture(context, TEXT1, 30f, Color.WHITE, getMaxLengthText())
                 textTextureId = id
                 textRatio = ratio
                 OLD_TEXT1 = TEXT1
@@ -418,7 +418,7 @@ class Texture2DProgram {
             val horizontalScale = scale * textRatio
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
-            Matrix.translateM(textMvpMatrix, 0, -0.8f + (horizontalScale / 2), 0.85f, 0f)  // Top-left corner
+            Matrix.translateM(textMvpMatrix, 0, -0.8f + (horizontalScale / 2), 0.83f, 0f)  // Top-left corner
             Matrix.scaleM(textMvpMatrix, 0, horizontalScale, scale, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uTextMVPMatrixLoc, 1, false, textMvpMatrix, 0)
@@ -440,7 +440,7 @@ class Texture2DProgram {
         // Create text
         if (TEXT2.isNotEmpty()) {
             if (text2TextureId == -1 || OLD_TEXT2 != TEXT2) {
-                val (id, ratio)  = createTextTexture(context, TEXT2, 30f, Color.WHITE)
+                val (id, ratio)  = createTextTexture(context, TEXT2, 30f, Color.WHITE, getMaxLengthText())
                 text2TextureId = id
                 text2Ratio = ratio
                 OLD_TEXT2 = TEXT2
@@ -463,7 +463,7 @@ class Texture2DProgram {
             val horizontalScale = scale * text2Ratio
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
-            Matrix.translateM(textMvpMatrix, 0, -0.8f + (horizontalScale / 2), 0.8f, 0f)  // Top-left corner
+            Matrix.translateM(textMvpMatrix, 0, -0.8f + (horizontalScale / 2), 0.76f, 0f)  // Top-left corner
             Matrix.scaleM(textMvpMatrix, 0, horizontalScale, scale, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uText2MVPMatrixLoc, 1, false, textMvpMatrix, 0)
@@ -485,7 +485,7 @@ class Texture2DProgram {
         // Create text
         if (TEXT3.isNotEmpty()) {
             if (text3TextureId == -1 || OLD_TEXT3 != TEXT3) {
-                val (id, ratio) = createTextTexture(context, TEXT3, 30f, Color.WHITE)
+                val (id, ratio) = createTextTexture(context, TEXT3, 30f, Color.WHITE, getMaxLengthText())
                 text3TextureId = id
                 text3Ratio = ratio
                 OLD_TEXT3 = TEXT3
@@ -553,7 +553,7 @@ class Texture2DProgram {
             val horizontalScale = scale * text4Ratio
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
-            Matrix.translateM(textMvpMatrix, 0, -0.8f + (horizontalScale / 2), 0.75f, 0f)  // Top-left corner
+            Matrix.translateM(textMvpMatrix, 0, -0.8f + (horizontalScale / 2), 0.69f, 0f)  // Top-left corner
             Matrix.scaleM(textMvpMatrix, 0, horizontalScale, scale, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uText4MVPMatrixLoc, 1, false, textMvpMatrix, 0)
@@ -619,7 +619,7 @@ class Texture2DProgram {
         return Pair(textureHandle[0], ratio)
     }
 
-    private fun createTextTexture(context: Context, text: String, size: Float, textColor: Int): Pair<Int, Float>  {
+    private fun createTextTexture(context: Context, text: String, size: Float, textColor: Int, maxLengthText: String? = null): Pair<Int, Float>  {
         // Create a bitmap with room for the text
         val paint = Paint().apply {
             textSize = size
@@ -636,7 +636,11 @@ class Texture2DProgram {
 
         // Measure text dimensions
         val textBounds = Rect()
-        paint.getTextBounds(text, 0, text.length, textBounds)
+        var t = text
+        if (maxLengthText != null) {
+            t = maxLengthText
+        }
+        paint.getTextBounds(t, 0, t.length, textBounds)
         val width = textBounds.width() + 16  // Add padding
         val height = textBounds.height() + 16  // Add padding
 
@@ -663,6 +667,11 @@ class Texture2DProgram {
         bitmap.recycle()
 
         return Pair(textureHandle[0], (width / height).toFloat())
+    }
+
+    fun getMaxLengthText(): String? {
+        val allTexts = listOf(TEXT1, TEXT2, TEXT3)
+        return allTexts.maxByOrNull { it.length }
     }
 
     companion object {
