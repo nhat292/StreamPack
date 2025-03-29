@@ -563,10 +563,10 @@ class Texture2DProgram {
         val height = textBounds.height() + 16  // Add padding
 
         // Create a bitmap and draw text on it
-        val viewport = IntArray(4)
-        GLES20.glGetIntegerv(GLES20.GL_VIEWPORT, viewport, 0)
-        val screenWidth = viewport[2]
-        val bitmap = Bitmap.createBitmap(screenWidth, height, Bitmap.Config.ARGB_8888)
+//        val viewport = IntArray(4)
+//        GLES20.glGetIntegerv(GLES20.GL_VIEWPORT, viewport, 0)
+//        val screenWidth = viewport[2]
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
         canvas.drawText(text, 0f, height - 8f - textBounds.bottom, paint)
@@ -586,7 +586,7 @@ class Texture2DProgram {
         // Clean up
         bitmap.recycle()
 
-        return Pair(textureHandle[0], screenWidth)
+        return Pair(textureHandle[0], width)
     }
 
     companion object {
