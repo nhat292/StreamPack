@@ -28,6 +28,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.Rect
+import android.graphics.RectF
 import android.graphics.Typeface
 import android.opengl.Matrix
 import io.github.thibaultbee.streampack.R
@@ -630,8 +631,17 @@ class Texture2DProgram {
         }
 
         val backgroundPaint = Paint().apply {
-            color = Color.BLUE
+            color = Color.parseColor("#13235B")
             style = Paint.Style.FILL
+            isAntiAlias = true
+        }
+
+        val borderWidth = 2f
+        val borderPaint = Paint().apply {
+            color = Color.GREEN
+            style = Paint.Style.STROKE
+            strokeWidth = borderWidth
+            isAntiAlias = true
         }
 
         // Measure text dimensions
@@ -641,15 +651,22 @@ class Texture2DProgram {
             t = maxLengthText
         }
         paint.getTextBounds(t, 0, t.length, textBounds)
-        val width = textBounds.width() + 16  // Add padding
-        val height = textBounds.height() + 16  // Add padding
+        val padding = 8f
+        val width = textBounds.width() + (padding * 2) + (borderWidth * 2)
+        val height = textBounds.height() + (padding * 2) + (borderWidth * 2)
 
         // Create a bitmap and draw text on it
-        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val bitmap = Bitmap.createBitmap(width.toInt(), height.toInt(), Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
-        canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), backgroundPaint)
-//        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
-        canvas.drawText(text, 0f, height - 8f - textBounds.bottom, paint)
+        canvas.drawRect(borderWidth, borderWidth, width - borderWidth, height - borderWidth, backgroundPaint)
+        val borderRect = RectF(
+            borderWidth / 2,
+            borderWidth / 2,
+            width - borderWidth / 2,
+            height - borderWidth / 2
+        )
+        canvas.drawRect(borderRect, borderPaint)
+        canvas.drawText(text, padding + borderWidth, height - padding - textBounds.bottom - borderWidth, paint)
 
         // Create an OpenGL texture
         val textureHandle = IntArray(1)
