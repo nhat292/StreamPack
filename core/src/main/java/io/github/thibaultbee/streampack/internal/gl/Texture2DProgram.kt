@@ -389,8 +389,8 @@ class Texture2DProgram {
                 GLES20.glUniform1i(uTextTextureLoc, 2)
                 GlUtils.checkGlError("glUniform1i")
             }
-            val horizontalScale = 0.2f
-            val verticalScale = 0.2f  // Keep vertical scale more consistent
+            val horizontalScale = 0.15f
+            val verticalScale = 0.15f  // Keep vertical scale more consistent
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
             Matrix.translateM(textMvpMatrix, 0, 0f, 0.83f, 0f)  // Top-left corner
@@ -434,8 +434,8 @@ class Texture2DProgram {
                 GLES20.glUniform1i(uTextTextureLoc, 3)
                 GlUtils.checkGlError("glUniform1i")
             }
-            val horizontalScale = 0.2f
-            val verticalScale = 0.2f  // Keep vertical scale more consistent
+            val horizontalScale = 0.15f
+            val verticalScale = 0.15f  // Keep vertical scale more consistent
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
             Matrix.translateM(textMvpMatrix, 0, 0f, 0.76f, 0f)  // Top-left corner
@@ -479,8 +479,8 @@ class Texture2DProgram {
                 GLES20.glUniform1i(uTextTextureLoc, 4)
                 GlUtils.checkGlError("glUniform1i")
             }
-            val horizontalScale = 0.2f
-            val verticalScale = 0.2f  // Keep vertical scale more consistent
+            val horizontalScale = 0.15f
+            val verticalScale = 0.15f  // Keep vertical scale more consistent
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
             Matrix.translateM(textMvpMatrix, 0, 0f, 0.9f, 0f)  // Top-left corner
@@ -558,14 +558,10 @@ class Texture2DProgram {
         // Measure text dimensions
         val textBounds = Rect()
         paint.getTextBounds(text, 0, text.length, textBounds)
-        val charWidthEstimate = paint.measureText(text)
-        val width = charWidthEstimate.toInt() + 16  // Add padding
+        val width = textBounds.width() + 16  // Add padding
         val height = textBounds.height() + 16  // Add padding
 
         // Create a bitmap and draw text on it
-//        val viewport = IntArray(4)
-//        GLES20.glGetIntegerv(GLES20.GL_VIEWPORT, viewport, 0)
-//        val screenWidth = viewport[2]
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
