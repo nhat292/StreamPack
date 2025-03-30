@@ -676,7 +676,7 @@ class Texture2DProgram {
 
         val padding = 14f
         val width = textBounds.width() + (padding * 2) + (borderWidth * 2) + scoreTextWidth
-        val height = textBounds.height() + (padding * 2) + (borderWidth * 2) + scoreTextWidth
+        val height = textBounds.height() + (padding * 2) + (borderWidth * 2)
 
         // Create a bitmap and draw text on it
         val bitmap = Bitmap.createBitmap(width.toInt(), height.toInt(), Bitmap.Config.ARGB_8888)
@@ -724,7 +724,7 @@ class Texture2DProgram {
         // Clean up
         bitmap.recycle()
 
-        return Pair(textureHandle[0], (width / height).toFloat())
+        return Pair(textureHandle[0], (width / height))
     }
 
     private fun getMaxLengthText(): String? {
