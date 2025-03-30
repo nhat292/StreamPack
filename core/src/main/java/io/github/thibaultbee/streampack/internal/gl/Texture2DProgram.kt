@@ -396,7 +396,7 @@ class Texture2DProgram {
 
         if (TEXT1.isNotEmpty()) {
             if (textTextureId == -1 || OLD_TEXT1 != TEXT1) {
-                val (id, ratio) = createTextTexture(TEXT1, 30f, Color.WHITE, getMaxLengthText(), 2)
+                val (id, ratio) = createTextTexture(TEXT1, 30f, Color.WHITE, getMaxLengthText(), 2, 1)
                 textTextureId = id
                 textRatio = ratio
                 OLD_TEXT1 = TEXT1
@@ -441,7 +441,7 @@ class Texture2DProgram {
         // Create text
         if (TEXT2.isNotEmpty()) {
             if (text2TextureId == -1 || OLD_TEXT2 != TEXT2) {
-                val (id, ratio)  = createTextTexture(TEXT2, 30f, Color.WHITE, getMaxLengthText(), 3)
+                val (id, ratio)  = createTextTexture(TEXT2, 30f, Color.WHITE, getMaxLengthText(), 3, 2)
                 text2TextureId = id
                 text2Ratio = ratio
                 OLD_TEXT2 = TEXT2
@@ -620,7 +620,7 @@ class Texture2DProgram {
         return Pair(textureHandle[0], ratio)
     }
 
-    private fun createTextTexture(text: String, size: Float, textColor: Int, maxLengthText: String? = null, score: Int? = null): Pair<Int, Float>  {
+    private fun createTextTexture(text: String, size: Float, textColor: Int, maxLengthText: String? = null, score: Int? = null, turn: Int? = null): Pair<Int, Float>  {
         // Create a bitmap with room for the text
         val paint = Paint().apply {
             textSize = size
@@ -633,6 +633,14 @@ class Texture2DProgram {
         val scorePaint = Paint().apply {
             textSize = size
             color = Color.parseColor("#13235B")
+            isAntiAlias = true
+            typeface = Typeface.DEFAULT_BOLD
+            textAlign = Paint.Align.CENTER
+        }
+
+        val turnPaint = Paint().apply {
+            textSize = size
+            color = textColor
             isAntiAlias = true
             typeface = Typeface.DEFAULT_BOLD
             textAlign = Paint.Align.CENTER
@@ -665,6 +673,7 @@ class Texture2DProgram {
             t = maxLengthText
         }
         paint.getTextBounds(t, 0, t.length, textBounds)
+        val textWidth =  textBounds.width()
 
         var scoreTextWidth = 0
         if (score != null) {
@@ -674,15 +683,23 @@ class Texture2DProgram {
             scoreTextWidth = scoreTextBounds.width()
         }
 
+        var turnTextWidth = 0
+        if (score != null) {
+            val turnText = "000"
+            val turnTextBounds = Rect()
+            paint.getTextBounds(turnText, 0, turnText.length, turnTextBounds)
+            turnTextWidth = turnTextBounds.width()
+        }
+
         val padding = 14f
-        val width = textBounds.width() + (padding * 2) + (borderWidth * 2) + scoreTextWidth
+        val width = textBounds.width() + (padding * 2) + (borderWidth * 2) + scoreTextWidth + turnTextWidth
         val height = textBounds.height() + (padding * 2) + (borderWidth * 2)
 
         // Create a bitmap and draw text on it
         val bitmap = Bitmap.createBitmap(width.toInt(), height.toInt(), Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         val bgRect = RectF(
-            borderWidth + scoreTextWidth,
+            borderWidth,
             borderWidth,
             width - borderWidth,
             height - borderWidth
@@ -690,9 +707,9 @@ class Texture2DProgram {
         canvas.drawRect(bgRect, backgroundPaint)
         if (score != null) {
             val scoreBgRect = RectF(
+                borderWidth + textWidth + turnTextWidth,
                 borderWidth,
-                borderWidth,
-                scoreTextWidth.toFloat(),
+                width - borderWidth,
                 height - borderWidth
             )
             canvas.drawRect(scoreBgRect, scoreBackgroundPaint)
@@ -704,9 +721,13 @@ class Texture2DProgram {
             height - borderWidth / 2
         )
         canvas.drawRect(borderRect, borderPaint)
-        canvas.drawText(text, padding + borderWidth + scoreTextWidth, height - padding - textBounds.bottom - borderWidth, paint)
+        canvas.drawText(text, padding + borderWidth, height - padding - textBounds.bottom - borderWidth, paint)
         if (score != null) {
-            canvas.drawText("$score", borderWidth + (scoreTextWidth / 2), height - padding - textBounds.bottom - borderWidth, scorePaint)
+            canvas.drawText("$score", borderWidth + textWidth + turnTextWidth + (scoreTextWidth / 2), height - padding - textBounds.bottom - borderWidth, scorePaint)
+        }
+
+        if (turn != null) {
+            canvas.drawText("$turn", borderWidth + textWidth + (turnTextWidth / 2), height - padding - textBounds.bottom - borderWidth, turnPaint)
         }
 
         // Create an OpenGL texture
