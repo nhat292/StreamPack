@@ -395,11 +395,13 @@ class Texture2DProgram {
         // Create text
 
         if (TEXT1.isNotEmpty()) {
-            if (textTextureId == -1 || OLD_TEXT1 != TEXT1) {
-                val (id, ratio) = createTextTexture(TEXT1, 30f, Color.WHITE, getMaxLengthText(), 2, 1)
+            if (textTextureId == -1 || OLD_TEXT1 != TEXT1 || OLD_SCORE1 != SCORE1 || OLD_TURN1 != TURN1) {
+                val (id, ratio) = createTextTexture(TEXT1, 30f, Color.WHITE, getMaxLengthText(), SCORE1, TURN1)
                 textTextureId = id
                 textRatio = ratio
                 OLD_TEXT1 = TEXT1
+                OLD_SCORE1 = SCORE1
+                OLD_TURN1 = TURN1
             }
             GLES20.glUseProgram(textProgramHandle)
             GlUtils.checkGlError("glUseProgram text")
@@ -440,11 +442,13 @@ class Texture2DProgram {
 
         // Create text
         if (TEXT2.isNotEmpty()) {
-            if (text2TextureId == -1 || OLD_TEXT2 != TEXT2) {
-                val (id, ratio)  = createTextTexture(TEXT2, 30f, Color.WHITE, getMaxLengthText(), 3, 2)
+            if (text2TextureId == -1 || OLD_TEXT2 != TEXT2 || OLD_SCORE2 != SCORE2 || OLD_TURN2 != TURN2) {
+                val (id, ratio)  = createTextTexture(TEXT2, 30f, Color.WHITE, getMaxLengthText(), SCORE2, TURN2)
                 text2TextureId = id
                 text2Ratio = ratio
                 OLD_TEXT2 = TEXT2
+                OLD_SCORE2 = SCORE2
+                OLD_TURN2 = TURN2
             }
             GLES20.glUseProgram(text2ProgramHandle)
             GlUtils.checkGlError("glUseProgram text")
@@ -620,7 +624,7 @@ class Texture2DProgram {
         return Pair(textureHandle[0], ratio)
     }
 
-    private fun createTextTexture(text: String, size: Float, textColor: Int, maxLengthText: String? = null, score: Int? = null, turn: Int? = null): Pair<Int, Float>  {
+    private fun createTextTexture(text: String, size: Float, textColor: Int, maxLengthText: String? = null, score: String? = null, turn: String? = null): Pair<Int, Float>  {
         // Create a bitmap with room for the text
         val paint = Paint().apply {
             textSize = size
@@ -707,7 +711,7 @@ class Texture2DProgram {
         canvas.drawRect(bgRect, backgroundPaint)
         if (score != null) {
             val scoreBgRect = RectF(
-                borderWidth + textWidth + turnTextWidth,
+                borderWidth + textWidth + turnTextWidth + (2 * padding),
                 borderWidth,
                 width - borderWidth,
                 height - borderWidth
@@ -723,11 +727,11 @@ class Texture2DProgram {
         canvas.drawRect(borderRect, borderPaint)
         canvas.drawText(text, padding + borderWidth, height - padding - textBounds.bottom - borderWidth, paint)
         if (score != null) {
-            canvas.drawText("$score", borderWidth + textWidth + turnTextWidth + (scoreTextWidth / 2), height - padding - textBounds.bottom - borderWidth, scorePaint)
+            canvas.drawText("$score", borderWidth + textWidth + turnTextWidth + (2 * padding) + (scoreTextWidth / 2), height - padding - textBounds.bottom - borderWidth, scorePaint)
         }
 
         if (turn != null) {
-            canvas.drawText("$turn", borderWidth + textWidth + (turnTextWidth / 2), height - padding - textBounds.bottom - borderWidth, turnPaint)
+            canvas.drawText("$turn", borderWidth + textWidth + (2 * padding) + (turnTextWidth / 2), height - padding - textBounds.bottom - borderWidth, turnPaint)
         }
 
         // Create an OpenGL texture
@@ -763,6 +767,14 @@ class Texture2DProgram {
         var OLD_TEXT3 = ""
         var TEXT4 = ""
         var OLD_TEXT4 = ""
+        var SCORE1 = ""
+        var OLD_SCORE1 = ""
+        var SCORE2 = ""
+        var OLD_SCORE2 = ""
+        var TURN1 = ""
+        var OLD_TURN1 = ""
+        var TURN2 = ""
+        var OLD_TURN2 = ""
 
         // Simple vertex shader, used for all programs.
         private const val VERTEX_SHADER = """uniform mat4 uMVPMatrix;
