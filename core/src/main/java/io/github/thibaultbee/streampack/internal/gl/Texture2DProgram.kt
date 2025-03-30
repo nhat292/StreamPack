@@ -415,7 +415,7 @@ class Texture2DProgram {
                 GLES20.glUniform1i(uTextTextureLoc, 2)
                 GlUtils.checkGlError("glUniform1i")
             }
-            val scale = 0.035f
+            val scale = 0.04f
             val horizontalScale = scale * textRatio
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
@@ -460,7 +460,7 @@ class Texture2DProgram {
                 GLES20.glUniform1i(uTextTextureLoc, 3)
                 GlUtils.checkGlError("glUniform1i")
             }
-            val scale = 0.035f
+            val scale = 0.04f
             val horizontalScale = scale * text2Ratio
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
@@ -505,7 +505,7 @@ class Texture2DProgram {
                 GLES20.glUniform1i(uTextTextureLoc, 4)
                 GlUtils.checkGlError("glUniform1i")
             }
-            val scale = 0.035f
+            val scale = 0.04f
             val horizontalScale = scale * text3Ratio
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
@@ -550,7 +550,7 @@ class Texture2DProgram {
                 GLES20.glUniform1i(uTextTextureLoc, 5)
                 GlUtils.checkGlError("glUniform1i")
             }
-            val scale = 0.035f
+            val scale = 0.04f
             val horizontalScale = scale * text4Ratio
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
@@ -666,11 +666,11 @@ class Texture2DProgram {
         }
         paint.getTextBounds(t, 0, t.length, textBounds)
 
-        val scoreText = "000"
-        val scoreTextBounds = Rect()
-        paint.getTextBounds(scoreText, 0, scoreText.length, scoreTextBounds)
         var scoreTextWidth = 0
         if (score != null) {
+            val scoreText = "000"
+            val scoreTextBounds = Rect()
+            paint.getTextBounds(scoreText, 0, scoreText.length, scoreTextBounds)
             scoreTextWidth = scoreTextBounds.width()
         }
 
@@ -682,7 +682,7 @@ class Texture2DProgram {
         val bitmap = Bitmap.createBitmap(width.toInt(), height.toInt(), Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         val bgRect = RectF(
-            borderWidth,
+            borderWidth + scoreTextWidth,
             borderWidth,
             width - borderWidth,
             height - borderWidth
@@ -706,7 +706,7 @@ class Texture2DProgram {
         canvas.drawRect(borderRect, borderPaint)
         canvas.drawText(text, padding + borderWidth + scoreTextWidth, height - padding - textBounds.bottom - borderWidth, paint)
         if (score != null) {
-            canvas.drawText("$score", borderWidth + (scoreTextWidth / 2), height - padding - scoreTextBounds.bottom - borderWidth, scorePaint)
+            canvas.drawText("$score", borderWidth + (scoreTextWidth / 2), height - padding - textBounds.bottom - borderWidth, scorePaint)
         }
 
         // Create an OpenGL texture
