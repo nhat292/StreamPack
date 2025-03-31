@@ -87,6 +87,10 @@ class Texture2DProgram {
     private var text4TextureId: Int = -1
     private var text4Ratio: Float = 0f
 
+    private val textScale = 0.1f
+    private val startY = 0.85f
+    private val spacing = 0.7f
+
     init {
         programHandle = createProgram(VERTEX_SHADER, FRAGMENT_SHADER_EXT)
         if (programHandle == 0) {
@@ -417,12 +421,11 @@ class Texture2DProgram {
                 GLES20.glUniform1i(uTextTextureLoc, 2)
                 GlUtils.checkGlError("glUniform1i")
             }
-            val scale = 0.04f
-            val horizontalScale = scale * textRatio
+            val horizontalScale = textScale * textRatio
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
-            Matrix.translateM(textMvpMatrix, 0, -0.95f + (horizontalScale / 2), 0.8f, 0f)  // Top-left corner
-            Matrix.scaleM(textMvpMatrix, 0, horizontalScale, scale, 1f)  // Scale to appropriate size
+            Matrix.translateM(textMvpMatrix, 0, -0.95f + (horizontalScale / 2), startY - spacing, 0f)  // Top-left corner
+            Matrix.scaleM(textMvpMatrix, 0, horizontalScale, textScale, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uTextMVPMatrixLoc, 1, false, textMvpMatrix, 0)
 
@@ -464,12 +467,11 @@ class Texture2DProgram {
                 GLES20.glUniform1i(uTextTextureLoc, 3)
                 GlUtils.checkGlError("glUniform1i")
             }
-            val scale = 0.04f
-            val horizontalScale = scale * text2Ratio
+            val horizontalScale = textScale * text2Ratio
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
-            Matrix.translateM(textMvpMatrix, 0, -0.95f + (horizontalScale / 2), 0.75f, 0f)  // Top-left corner
-            Matrix.scaleM(textMvpMatrix, 0, horizontalScale, scale, 1f)  // Scale to appropriate size
+            Matrix.translateM(textMvpMatrix, 0, -0.95f + (horizontalScale / 2), startY - (2 * spacing), 0f)  // Top-left corner
+            Matrix.scaleM(textMvpMatrix, 0, horizontalScale, textScale, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uText2MVPMatrixLoc, 1, false, textMvpMatrix, 0)
 
@@ -509,12 +511,11 @@ class Texture2DProgram {
                 GLES20.glUniform1i(uTextTextureLoc, 4)
                 GlUtils.checkGlError("glUniform1i")
             }
-            val scale = 0.04f
-            val horizontalScale = scale * text3Ratio
+            val horizontalScale = textScale * text3Ratio
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
-            Matrix.translateM(textMvpMatrix, 0, -0.95f + (horizontalScale / 2), 0.85f, 0f)  // Top-left corner
-            Matrix.scaleM(textMvpMatrix, 0, horizontalScale, scale, 1f)  // Scale to appropriate size
+            Matrix.translateM(textMvpMatrix, 0, -0.95f + (horizontalScale / 2), startY, 0f)  // Top-left corner
+            Matrix.scaleM(textMvpMatrix, 0, horizontalScale, textScale, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uText3MVPMatrixLoc, 1, false, textMvpMatrix, 0)
 
@@ -554,12 +555,11 @@ class Texture2DProgram {
                 GLES20.glUniform1i(uTextTextureLoc, 5)
                 GlUtils.checkGlError("glUniform1i")
             }
-            val scale = 0.04f
-            val horizontalScale = scale * text4Ratio
+            val horizontalScale = textScale * text4Ratio
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
-            Matrix.translateM(textMvpMatrix, 0, -0.95f + (horizontalScale / 2), 0.7f, 0f)  // Top-left corner
-            Matrix.scaleM(textMvpMatrix, 0, horizontalScale, scale, 1f)  // Scale to appropriate size
+            Matrix.translateM(textMvpMatrix, 0, -0.95f + (horizontalScale / 2), startY - (3 * spacing), 0f)  // Top-left corner
+            Matrix.scaleM(textMvpMatrix, 0, horizontalScale, textScale, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uText4MVPMatrixLoc, 1, false, textMvpMatrix, 0)
 
