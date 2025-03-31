@@ -89,7 +89,7 @@ class Texture2DProgram {
 
     private val textScale = 0.08f
     private val startY = 0.85f
-    private val spacing = 0.07f
+    private val spacing = 0.075f
 
     init {
         programHandle = createProgram(VERTEX_SHADER, FRAGMENT_SHADER_EXT)
@@ -421,11 +421,12 @@ class Texture2DProgram {
                 GLES20.glUniform1i(uTextTextureLoc, 2)
                 GlUtils.checkGlError("glUniform1i")
             }
-            val horizontalScale = textScale * textRatio
+            var horizontalScale = textScale * textRatio
+            horizontalScale -= (horizontalScale * 0.008f)
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
             Matrix.translateM(textMvpMatrix, 0, -0.95f + (horizontalScale / 2), startY - spacing, 0f)  // Top-left corner
-            Matrix.scaleM(textMvpMatrix, 0, horizontalScale - (horizontalScale * 0.005f), textScale, 1f)  // Scale to appropriate size
+            Matrix.scaleM(textMvpMatrix, 0, horizontalScale, textScale, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uTextMVPMatrixLoc, 1, false, textMvpMatrix, 0)
 
@@ -467,11 +468,12 @@ class Texture2DProgram {
                 GLES20.glUniform1i(uTextTextureLoc, 3)
                 GlUtils.checkGlError("glUniform1i")
             }
-            val horizontalScale = textScale * text2Ratio
+            var horizontalScale = textScale * text2Ratio
+            horizontalScale -= (horizontalScale * 0.008f)
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
             Matrix.translateM(textMvpMatrix, 0, -0.95f + (horizontalScale / 2), startY - (2 * spacing), 0f)  // Top-left corner
-            Matrix.scaleM(textMvpMatrix, 0, horizontalScale - (horizontalScale * 0.005f), textScale, 1f)  // Scale to appropriate size
+            Matrix.scaleM(textMvpMatrix, 0, horizontalScale, textScale, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uText2MVPMatrixLoc, 1, false, textMvpMatrix, 0)
 
@@ -511,11 +513,12 @@ class Texture2DProgram {
                 GLES20.glUniform1i(uTextTextureLoc, 4)
                 GlUtils.checkGlError("glUniform1i")
             }
-            val horizontalScale = textScale * text3Ratio
+            var horizontalScale = textScale * text3Ratio
+            horizontalScale -= (horizontalScale * 0.008f)
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
             Matrix.translateM(textMvpMatrix, 0, -0.95f + (horizontalScale / 2), startY, 0f)  // Top-left corner
-            Matrix.scaleM(textMvpMatrix, 0, horizontalScale - (horizontalScale * 0.005f), textScale, 1f)  // Scale to appropriate size
+            Matrix.scaleM(textMvpMatrix, 0, horizontalScale, textScale, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uText3MVPMatrixLoc, 1, false, textMvpMatrix, 0)
 
@@ -555,11 +558,12 @@ class Texture2DProgram {
                 GLES20.glUniform1i(uTextTextureLoc, 5)
                 GlUtils.checkGlError("glUniform1i")
             }
-            val horizontalScale = textScale * text4Ratio
+            var horizontalScale = textScale * text4Ratio
+            horizontalScale -= (horizontalScale * 0.008f)
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
             Matrix.translateM(textMvpMatrix, 0, -0.95f + (horizontalScale / 2), startY - (3 * spacing), 0f)  // Top-left corner
-            Matrix.scaleM(textMvpMatrix, 0, horizontalScale - (horizontalScale * 0.005f), textScale, 1f)  // Scale to appropriate size
+            Matrix.scaleM(textMvpMatrix, 0, horizontalScale, textScale, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uText4MVPMatrixLoc, 1, false, textMvpMatrix, 0)
 
