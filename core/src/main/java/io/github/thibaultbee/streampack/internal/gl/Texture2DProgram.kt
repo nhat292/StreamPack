@@ -191,8 +191,8 @@ class Texture2DProgram {
         checkLocation(aLink1PositionLoc, "aLink1Position")
         aLink1TextureCoordLoc = GLES20.glGetAttribLocation(link1ProgramHandle, "aLink1TextureCoord")
         checkLocation(aLink1TextureCoordLoc, "aLink1TextureCoord")
-        uLink1MVPMatrixLoc = GLES20.glGetUniformLocation(link1ProgramHandle, "uLogoMVPMatrix")
-        checkLocation(uLink1MVPMatrixLoc, "uLogoMVPMatrix")
+        uLink1MVPMatrixLoc = GLES20.glGetUniformLocation(link1ProgramHandle, "uLink1MVPMatrix")
+        checkLocation(uLink1MVPMatrixLoc, "uLink1MVPMatrix")
 
 
     }
@@ -1007,7 +1007,7 @@ class Texture2DProgram {
     }
     """
 
-        private const val VERTEX_SHADER_2D_LINK1 = """uniform mat4 uLinkMVPMatrix;
+        private const val VERTEX_SHADER_2D_LINK1 = """uniform mat4 uLink1MVPMatrix;
     attribute vec2 aLink1Position;
     attribute vec2 aLink1TextureCoord;
     varying vec2 vTextureCoord;
