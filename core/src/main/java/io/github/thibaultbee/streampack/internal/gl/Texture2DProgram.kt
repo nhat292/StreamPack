@@ -334,7 +334,7 @@ class Texture2DProgram {
      * @param texBuffer Buffer with vertex texture data.
      * @param texStride Width, in bytes, of the texture data for each vertex.
      */
-    suspend fun draw(
+    fun draw(
         context: Context,
         mvpMatrix: FloatArray, vertexBuffer: FloatBuffer, logoVertexBuffer: FloatBuffer, firstVertex: Int,
         vertexCount: Int, coordsPerVertex: Int, vertexStride: Int,
@@ -845,23 +845,21 @@ class Texture2DProgram {
         return allTexts.maxByOrNull { it.length }
     }
 
-    private suspend fun loadBitmapFromUrl(url: String): Bitmap? {
-        return withContext(Dispatchers.IO) {
-            var connection: HttpURLConnection? = null
-            var inputStream: InputStream? = null
-            try {
-                connection = URL(url).openConnection() as HttpURLConnection
-                connection.doInput = true
-                connection.connect()
-                inputStream = connection.inputStream
-                BitmapFactory.decodeStream(inputStream)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            } finally {
-                inputStream?.close()
-                connection?.disconnect()
-            }
+    private fun loadBitmapFromUrl(url: String): Bitmap? {
+        var connection: HttpURLConnection? = null
+        var inputStream: InputStream? = null
+        try {
+            connection = URL(url).openConnection() as HttpURLConnection
+            connection.doInput = true
+            connection.connect()
+            inputStream = connection.inputStream
+            return BitmapFactory.decodeStream(inputStream)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
+        } finally {
+            inputStream?.close()
+            connection?.disconnect()
         }
     }
 
