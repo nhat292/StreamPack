@@ -32,6 +32,9 @@ import android.graphics.RectF
 import android.graphics.Typeface
 import android.opengl.Matrix
 import io.github.thibaultbee.streampack.R
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -331,7 +334,7 @@ class Texture2DProgram {
      * @param texBuffer Buffer with vertex texture data.
      * @param texStride Width, in bytes, of the texture data for each vertex.
      */
-    fun draw(
+    suspend fun draw(
         context: Context,
         mvpMatrix: FloatArray, vertexBuffer: FloatBuffer, logoVertexBuffer: FloatBuffer, firstVertex: Int,
         vertexCount: Int, coordsPerVertex: Int, vertexStride: Int,
@@ -842,34 +845,51 @@ class Texture2DProgram {
         return allTexts.maxByOrNull { it.length }
     }
 
-    private fun loadBitmapFromUrl(url: String): Bitmap? {
-        return try {
-            val connection = URL(url).openConnection() as HttpURLConnection
-            connection.doInput = true
-            connection.connect()
-            val input = connection.inputStream
-            BitmapFactory.decodeStream(input)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
+    private suspend fun loadBitmapFromUrl(url: String): Bitmap? {
+        return withContext(Dispatchers.IO) {
+            var connection: HttpURLConnection? = null
+            var inputStream: InputStream? = null
+            try {
+                connection = URL(url).openConnection() as HttpURLConnection
+                connection.doInput = true
+                connection.connect()
+                inputStream = connection.inputStream
+                BitmapFactory.decodeStream(inputStream)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            } finally {
+                inputStream?.close()
+                connection?.disconnect()
+            }
         }
     }
 
-    fun loadTextureFromBitmap(bitmap: Bitmap): Pair<Int, Float> {
+    private fun loadTextureFromBitmap(bitmap: Bitmap): Pair<Int, Float> {
         val textureHandle = IntArray(1)
         GLES20.glGenTextures(1, textureHandle, 0)
 
         if (textureHandle[0] != 0) {
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0])
+
+            // Load the bitmap into the bound texture
             GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0)
 
+            // Set texture parameters
             GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR)
             GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR)
 
+            // Unbind the texture
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0)
+
+            // Recycle the bitmap to free memory
+            bitmap.recycle()
         }
 
-        return Pair(textureHandle[0], (bitmap.width / bitmap.height).toFloat())
+        // Calculate aspect ratio correctly as float
+        val aspectRatio = bitmap.width.toFloat() / bitmap.height.toFloat()
+
+        return Pair(textureHandle[0], aspectRatio)
     }
 
     companion object {
