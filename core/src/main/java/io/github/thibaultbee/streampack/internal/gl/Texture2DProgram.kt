@@ -102,7 +102,7 @@ class Texture2DProgram {
 
     private val textScale = 0.08f
     private val startX = -0.98f
-    private val startY = 0.95f
+    private val startY = 0.8f
     private val spacing = 0.075f
 
     init {
@@ -867,6 +867,9 @@ class Texture2DProgram {
         val textureHandle = IntArray(1)
         GLES20.glGenTextures(1, textureHandle, 0)
 
+        // Calculate aspect ratio correctly as float
+        val aspectRatio = bitmap.width.toFloat() / bitmap.height.toFloat()
+
         if (textureHandle[0] != 0) {
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0])
 
@@ -883,9 +886,6 @@ class Texture2DProgram {
             // Recycle the bitmap to free memory
             bitmap.recycle()
         }
-
-        // Calculate aspect ratio correctly as float
-        val aspectRatio = bitmap.width.toFloat() / bitmap.height.toFloat()
 
         return Pair(textureHandle[0], aspectRatio)
     }
@@ -909,7 +909,7 @@ class Texture2DProgram {
         var TURN2 = ""
         var OLD_TURN2 = ""
 
-        var LINK1 = ""
+        var LINK1 = "https://firebasestorage.googleapis.com/v0/b/colorc-e314d.appspot.com/o/sc%2FVitri_1.png?alt=media&token=8c1050c9-9c7c-4ad5-bb7d-6e6c748ab4b7"
         var OLD_LINK1 = ""
 
         // Simple vertex shader, used for all programs.
