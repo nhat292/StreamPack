@@ -909,7 +909,7 @@ class Texture2DProgram {
         var TURN2 = ""
         var OLD_TURN2 = ""
 
-        var LINK1 = "https://firebasestorage.googleapis.com/v0/b/colorc-e314d.appspot.com/o/sc%2FVitri_1.png?alt=media&token=8c1050c9-9c7c-4ad5-bb7d-6e6c748ab4b7"
+        var LINK1 = ""
         var OLD_LINK1 = ""
 
         // Simple vertex shader, used for all programs.
