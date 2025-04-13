@@ -81,6 +81,16 @@ class Texture2DProgram {
     private val aLink1PositionLoc: Int
     private val aLink1TextureCoordLoc: Int
 
+    private val link2ProgramHandle: Int
+    private val uLink2MVPMatrixLoc: Int
+    private val aLink2PositionLoc: Int
+    private val aLink2TextureCoordLoc: Int
+
+    private val link3ProgramHandle: Int
+    private val uLink3MVPMatrixLoc: Int
+    private val aLink3PositionLoc: Int
+    private val aLink3TextureCoordLoc: Int
+
     private var logoTextureId: Int = -1
     private var logoRatio: Float = 0f
 
@@ -100,6 +110,16 @@ class Texture2DProgram {
     private var link1Ratio: Float = 0f
     private var loadingLink1Bitmap: Boolean = false
     private var bitmapLink1: Bitmap? = null
+
+    private var link2TextureId: Int = -1
+    private var link2Ratio: Float = 0f
+    private var loadingLink2Bitmap: Boolean = false
+    private var bitmapLink2: Bitmap? = null
+
+    private var link3TextureId: Int = -1
+    private var link3Ratio: Float = 0f
+    private var loadingLink3Bitmap: Boolean = false
+    private var bitmapLink3: Bitmap? = null
 
     private val textScale = 0.08f
     private val startX = -0.98f
@@ -138,6 +158,16 @@ class Texture2DProgram {
 
         link1ProgramHandle = createProgram(VERTEX_SHADER_2D_LINK1, FRAGMENT_SHADER_2D_LINK1)
         if (link1ProgramHandle == 0) {
+            throw RuntimeException("Unable to create program")
+        }
+
+        link2ProgramHandle = createProgram(VERTEX_SHADER_2D_LINK2, FRAGMENT_SHADER_2D_LINK2)
+        if (link2ProgramHandle == 0) {
+            throw RuntimeException("Unable to create program")
+        }
+
+        link3ProgramHandle = createProgram(VERTEX_SHADER_2D_LINK3, FRAGMENT_SHADER_2D_LINK3)
+        if (link3ProgramHandle == 0) {
             throw RuntimeException("Unable to create program")
         }
 
@@ -198,6 +228,20 @@ class Texture2DProgram {
         uLink1MVPMatrixLoc = GLES20.glGetUniformLocation(link1ProgramHandle, "uLink1MVPMatrix")
         checkLocation(uLink1MVPMatrixLoc, "uLink1MVPMatrix")
 
+        aLink2PositionLoc = GLES20.glGetAttribLocation(link2ProgramHandle, "aLink2Position")
+        checkLocation(aLink2PositionLoc, "aLink2Position")
+        aLink2TextureCoordLoc = GLES20.glGetAttribLocation(link2ProgramHandle, "aLink2TextureCoord")
+        checkLocation(aLink2TextureCoordLoc, "aLink2TextureCoord")
+        uLink2MVPMatrixLoc = GLES20.glGetUniformLocation(link2ProgramHandle, "uLink2MVPMatrix")
+        checkLocation(uLink2MVPMatrixLoc, "uLink2MVPMatrix")
+
+        aLink3PositionLoc = GLES20.glGetAttribLocation(link3ProgramHandle, "aLink3Position")
+        checkLocation(aLink3PositionLoc, "aLin3Position")
+        aLink3TextureCoordLoc = GLES20.glGetAttribLocation(link3ProgramHandle, "aLink3TextureCoord")
+        checkLocation(aLink3TextureCoordLoc, "aLink3TextureCoord")
+        uLink3MVPMatrixLoc = GLES20.glGetUniformLocation(link3ProgramHandle, "uLink3MVPMatrix")
+        checkLocation(uLink3MVPMatrixLoc, "uLink3MVPMatrix")
+
 
     }
 
@@ -216,6 +260,8 @@ class Texture2DProgram {
         GLES20.glDeleteProgram(text3ProgramHandle)
         GLES20.glDeleteProgram(text4ProgramHandle)
         GLES20.glDeleteProgram(link1ProgramHandle)
+        GLES20.glDeleteProgram(link2ProgramHandle)
+        GLES20.glDeleteProgram(link3ProgramHandle)
     }
 
     /**
@@ -460,12 +506,12 @@ class Texture2DProgram {
                 }
 
                 // Adjust Logo Position
-                val scale = 0.12f
+                val scale = 0.1f
                 var horizontalScale = scale * link1Ratio
-                horizontalScale -= (horizontalScale * 0.01f)
+                horizontalScale -= (horizontalScale * 0.02f)
                 val link1MvpMatrix = FloatArray(16)
                 Matrix.setIdentityM(link1MvpMatrix, 0)
-                Matrix.translateM(link1MvpMatrix, 0, 0.85f - (0.117f / 2) - (horizontalScale / 2), 0.85f, 0f) // Adjust position (top-right corner)
+                Matrix.translateM(link1MvpMatrix, 0, 0.85f - (0.117f / 2) - (horizontalScale / 2) - 0.15f, 0.85f, 0f) // Adjust position (top-right corner)
                 Matrix.scaleM(link1MvpMatrix, 0, horizontalScale, scale, 1f)  // Scale down logo
 
                 GLES20.glUniformMatrix4fv(uLink1MVPMatrixLoc, 1, false, link1MvpMatrix, 0)
@@ -479,6 +525,128 @@ class Texture2DProgram {
                 GLES20.glEnableVertexAttribArray(aLink1TextureCoordLoc)
                 GlUtils.checkGlError("glEnableVertexAttribArray link1 texture")
                 GLES20.glVertexAttribPointer(aLink1TextureCoordLoc, 2, GLES20.GL_FLOAT, false, 0, logoTexBuffer)
+                GlUtils.checkGlError("glVertexAttribPointer logo texture")
+
+                GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
+                GlUtils.checkGlError("glDrawArrays logo")
+            }
+        }
+
+        // Link 2 PNG
+        if (LINK2.isNotEmpty() && !loadingLink2Bitmap) {
+            if (bitmapLink2 == null || LINK2 != OLD_LINK2) {
+                GlobalScope.launch(Dispatchers.IO) {
+                    link2TextureId = -1
+                    loadingLink2Bitmap = true
+                    bitmapLink2 = loadBitmapFromUrl(LINK2)
+                    loadingLink2Bitmap = false
+                    OLD_LINK2 = LINK2
+                }
+            }
+            if (bitmapLink2 != null && link2TextureId == -1) {
+                val (id, ratio) = loadTextureFromBitmap(bitmapLink2!!)
+                link2TextureId = id
+                link2Ratio = ratio
+            }
+
+            if (link2TextureId != -1) {
+                GLES20.glUseProgram(link2ProgramHandle)
+                GlUtils.checkGlError("glUseProgram link2")
+
+                GLES20.glActiveTexture(GLES20.GL_TEXTURE7)
+                GlUtils.checkGlError("glActiveTexture")
+                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, link2TextureId)
+                GlUtils.checkGlError("glBindTexture link2")
+
+                // Set Texture Uniform for Logo
+                val uLink1TextureLoc = GLES20.glGetUniformLocation(link2ProgramHandle, "sTexture")
+                GlUtils.checkGlError("glGetUniformLocation sTexture")
+                if (uLink1TextureLoc != -1) {
+                    GLES20.glUniform1i(uLink1TextureLoc, 7)
+                    GlUtils.checkGlError("glUniform1i")
+                }
+
+                // Adjust Logo Position
+                val scale = 0.1f
+                var horizontalScale = scale * link2Ratio
+                horizontalScale -= (horizontalScale * 0.02f)
+                val link2MvpMatrix = FloatArray(16)
+                Matrix.setIdentityM(link2MvpMatrix, 0)
+                Matrix.translateM(link2MvpMatrix, 0, startX + (horizontalScale / 2), 0.15f, 0f) // Adjust position (top-right corner)
+                Matrix.scaleM(link2MvpMatrix, 0, horizontalScale, scale, 1f)  // Scale down logo
+
+                GLES20.glUniformMatrix4fv(uLink2MVPMatrixLoc, 1, false, link2MvpMatrix, 0)
+                GlUtils.checkGlError("glUniformMatrix4fv link2")
+
+                GLES20.glEnableVertexAttribArray(aLink2PositionLoc)
+                GlUtils.checkGlError("glEnableVertexAttribArray link position")
+                GLES20.glVertexAttribPointer(aLink2PositionLoc, 2, GLES20.GL_FLOAT, false, 0, logoVertexBuffer)
+                GlUtils.checkGlError("glVertexAttribPointer logo position")
+
+                GLES20.glEnableVertexAttribArray(aLink2TextureCoordLoc)
+                GlUtils.checkGlError("glEnableVertexAttribArray link2 texture")
+                GLES20.glVertexAttribPointer(aLink2TextureCoordLoc, 2, GLES20.GL_FLOAT, false, 0, logoTexBuffer)
+                GlUtils.checkGlError("glVertexAttribPointer logo texture")
+
+                GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
+                GlUtils.checkGlError("glDrawArrays logo")
+            }
+        }
+
+        // Link 3 PNG
+        if (LINK3.isNotEmpty() && !loadingLink3Bitmap) {
+            if (bitmapLink3 == null || LINK3 != OLD_LINK3) {
+                GlobalScope.launch(Dispatchers.IO) {
+                    link3TextureId = -1
+                    loadingLink3Bitmap = true
+                    bitmapLink3 = loadBitmapFromUrl(LINK3)
+                    loadingLink3Bitmap = false
+                    OLD_LINK3 = LINK3
+                }
+            }
+            if (bitmapLink3 != null && link3TextureId == -1) {
+                val (id, ratio) = loadTextureFromBitmap(bitmapLink3!!)
+                link3TextureId = id
+                link3Ratio = ratio
+            }
+
+            if (link3TextureId != -1) {
+                GLES20.glUseProgram(link3ProgramHandle)
+                GlUtils.checkGlError("glUseProgram link3")
+
+                GLES20.glActiveTexture(GLES20.GL_TEXTURE8)
+                GlUtils.checkGlError("glActiveTexture")
+                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, link3TextureId)
+                GlUtils.checkGlError("glBindTexture link3")
+
+                // Set Texture Uniform for Logo
+                val uLink1TextureLoc = GLES20.glGetUniformLocation(link3ProgramHandle, "sTexture")
+                GlUtils.checkGlError("glGetUniformLocation sTexture")
+                if (uLink1TextureLoc != -1) {
+                    GLES20.glUniform1i(uLink1TextureLoc, 8)
+                    GlUtils.checkGlError("glUniform1i")
+                }
+
+                // Adjust Logo Position
+                val scale = 0.1f
+                var horizontalScale = scale * link3Ratio
+                horizontalScale -= (horizontalScale * 0.02f)
+                val link3MvpMatrix = FloatArray(16)
+                Matrix.setIdentityM(link3MvpMatrix, 0)
+                Matrix.translateM(link3MvpMatrix, 0, 0.85f - (horizontalScale / 2), 0.15f, 0f) // Adjust position (top-right corner)
+                Matrix.scaleM(link3MvpMatrix, 0, horizontalScale, scale, 1f)  // Scale down logo
+
+                GLES20.glUniformMatrix4fv(uLink3MVPMatrixLoc, 1, false, link3MvpMatrix, 0)
+                GlUtils.checkGlError("glUniformMatrix4fv link3")
+
+                GLES20.glEnableVertexAttribArray(aLink3PositionLoc)
+                GlUtils.checkGlError("glEnableVertexAttribArray link position")
+                GLES20.glVertexAttribPointer(aLink3PositionLoc, 2, GLES20.GL_FLOAT, false, 0, logoVertexBuffer)
+                GlUtils.checkGlError("glVertexAttribPointer logo position")
+
+                GLES20.glEnableVertexAttribArray(aLink3TextureCoordLoc)
+                GlUtils.checkGlError("glEnableVertexAttribArray link3 texture")
+                GLES20.glVertexAttribPointer(aLink3TextureCoordLoc, 2, GLES20.GL_FLOAT, false, 0, logoTexBuffer)
                 GlUtils.checkGlError("glVertexAttribPointer logo texture")
 
                 GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
@@ -681,6 +849,10 @@ class Texture2DProgram {
         GLES20.glDisableVertexAttribArray(aLogoTextureCoordLoc)
         GLES20.glDisableVertexAttribArray(aLink1PositionLoc)
         GLES20.glDisableVertexAttribArray(aLink1TextureCoordLoc)
+        GLES20.glDisableVertexAttribArray(aLink2PositionLoc)
+        GLES20.glDisableVertexAttribArray(aLink2TextureCoordLoc)
+        GLES20.glDisableVertexAttribArray(aLink3PositionLoc)
+        GLES20.glDisableVertexAttribArray(aLink3TextureCoordLoc)
         GLES20.glDisableVertexAttribArray(aTextPositionLoc)
         GLES20.glDisableVertexAttribArray(aTextTextureCoordLoc)
         GLES20.glDisableVertexAttribArray(aText2PositionLoc)
@@ -920,6 +1092,12 @@ class Texture2DProgram {
         var LINK1 = "https://firebasestorage.googleapis.com/v0/b/colorc-e314d.appspot.com/o/sc%2FVitri_1.png?alt=media&token=8c1050c9-9c7c-4ad5-bb7d-6e6c748ab4b7"
         var OLD_LINK1 = ""
 
+        var LINK2 = "https://firebasestorage.googleapis.com/v0/b/colorc-e314d.appspot.com/o/sc%2FVitri_2.png?alt=media&token=9e72e201-5d0e-418c-b951-a60742c583a8"
+        var OLD_LINK2 = ""
+
+        var LINK3 = "https://firebasestorage.googleapis.com/v0/b/colorc-e314d.appspot.com/o/sc%2FVitri_2.png?alt=media&token=9e72e201-5d0e-418c-b951-a60742c583a8"
+        var OLD_LINK3 = ""
+
         // Simple vertex shader, used for all programs.
         private const val VERTEX_SHADER = """uniform mat4 uMVPMatrix;
     uniform mat4 uTexMatrix;
@@ -1044,6 +1222,42 @@ class Texture2DProgram {
     """
 
         private const val FRAGMENT_SHADER_2D_LINK1 = """precision mediump float;
+    varying vec2 vTextureCoord;
+    uniform sampler2D sTexture;
+    void main() {
+        gl_FragColor = texture2D(sTexture, vTextureCoord);
+    }
+    """
+
+        private const val VERTEX_SHADER_2D_LINK2 = """uniform mat4 uLink2MVPMatrix;
+    attribute vec2 aLink2Position;
+    attribute vec2 aLink2TextureCoord;
+    varying vec2 vTextureCoord;
+    void main() {
+        gl_Position = uLink2MVPMatrix * vec4(aLink2Position, 0.0, 1.0);
+        vTextureCoord = aLink2TextureCoord;
+    }
+    """
+
+        private const val FRAGMENT_SHADER_2D_LINK2 = """precision mediump float;
+    varying vec2 vTextureCoord;
+    uniform sampler2D sTexture;
+    void main() {
+        gl_FragColor = texture2D(sTexture, vTextureCoord);
+    }
+    """
+
+        private const val VERTEX_SHADER_2D_LINK3 = """uniform mat4 uLink3MVPMatrix;
+    attribute vec2 aLink3Position;
+    attribute vec2 aLink3TextureCoord;
+    varying vec2 vTextureCoord;
+    void main() {
+        gl_Position = uLink3MVPMatrix * vec4(aLink3Position, 0.0, 1.0);
+        vTextureCoord = aLink3TextureCoord;
+    }
+    """
+
+        private const val FRAGMENT_SHADER_2D_LINK3 = """precision mediump float;
     varying vec2 vTextureCoord;
     uniform sampler2D sTexture;
     void main() {
