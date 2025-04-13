@@ -506,12 +506,12 @@ class Texture2DProgram {
                 }
 
                 // Adjust Logo Position
-                val scale = 0.1f
+                val scale = 0.11f
                 var horizontalScale = scale * link1Ratio
                 horizontalScale -= (horizontalScale * 0.02f)
                 val link1MvpMatrix = FloatArray(16)
                 Matrix.setIdentityM(link1MvpMatrix, 0)
-                Matrix.translateM(link1MvpMatrix, 0, 0.85f - (0.117f / 2) - (horizontalScale / 2) - 0.15f, 0.85f, 0f) // Adjust position (top-right corner)
+                Matrix.translateM(link1MvpMatrix, 0, 0.85f - (0.117f / 2) - (horizontalScale / 2) - 0.05f, 0.85f, 0f) // Adjust position (top-right corner)
                 Matrix.scaleM(link1MvpMatrix, 0, horizontalScale, scale, 1f)  // Scale down logo
 
                 GLES20.glUniformMatrix4fv(uLink1MVPMatrixLoc, 1, false, link1MvpMatrix, 0)
@@ -567,12 +567,12 @@ class Texture2DProgram {
                 }
 
                 // Adjust Logo Position
-                val scale = 0.1f
+                val scale = 0.11f
                 var horizontalScale = scale * link2Ratio
                 horizontalScale -= (horizontalScale * 0.02f)
                 val link2MvpMatrix = FloatArray(16)
                 Matrix.setIdentityM(link2MvpMatrix, 0)
-                Matrix.translateM(link2MvpMatrix, 0, startX + (horizontalScale / 2), 0.15f, 0f) // Adjust position (top-right corner)
+                Matrix.translateM(link2MvpMatrix, 0, startX + (horizontalScale / 2), -0.85f, 0f) // Adjust position (top-right corner)
                 Matrix.scaleM(link2MvpMatrix, 0, horizontalScale, scale, 1f)  // Scale down logo
 
                 GLES20.glUniformMatrix4fv(uLink2MVPMatrixLoc, 1, false, link2MvpMatrix, 0)
@@ -628,12 +628,12 @@ class Texture2DProgram {
                 }
 
                 // Adjust Logo Position
-                val scale = 0.1f
+                val scale = 0.11f
                 var horizontalScale = scale * link3Ratio
                 horizontalScale -= (horizontalScale * 0.02f)
                 val link3MvpMatrix = FloatArray(16)
                 Matrix.setIdentityM(link3MvpMatrix, 0)
-                Matrix.translateM(link3MvpMatrix, 0, 0.85f - (horizontalScale / 2), 0.15f, 0f) // Adjust position (top-right corner)
+                Matrix.translateM(link3MvpMatrix, 0, 0.98f - (horizontalScale / 2), -0.85f, 0f) // Adjust position (top-right corner)
                 Matrix.scaleM(link3MvpMatrix, 0, horizontalScale, scale, 1f)  // Scale down logo
 
                 GLES20.glUniformMatrix4fv(uLink3MVPMatrixLoc, 1, false, link3MvpMatrix, 0)
@@ -1089,13 +1089,13 @@ class Texture2DProgram {
         var TURN2 = ""
         var OLD_TURN2 = ""
 
-        var LINK1 = "https://firebasestorage.googleapis.com/v0/b/colorc-e314d.appspot.com/o/sc%2FVitri_1.png?alt=media&token=8c1050c9-9c7c-4ad5-bb7d-6e6c748ab4b7"
+        var LINK1 = ""
         var OLD_LINK1 = ""
 
-        var LINK2 = "https://firebasestorage.googleapis.com/v0/b/colorc-e314d.appspot.com/o/sc%2FVitri_2.png?alt=media&token=9e72e201-5d0e-418c-b951-a60742c583a8"
+        var LINK2 = ""
         var OLD_LINK2 = ""
 
-        var LINK3 = "https://firebasestorage.googleapis.com/v0/b/colorc-e314d.appspot.com/o/sc%2FVitri_2.png?alt=media&token=9e72e201-5d0e-418c-b951-a60742c583a8"
+        var LINK3 = ""
         var OLD_LINK3 = ""
 
         // Simple vertex shader, used for all programs.
