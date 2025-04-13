@@ -32,8 +32,7 @@ import android.graphics.RectF
 import android.graphics.Typeface
 import android.opengl.Matrix
 import io.github.thibaultbee.streampack.R
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
@@ -99,6 +98,8 @@ class Texture2DProgram {
 
     private var link1TextureId: Int = -1
     private var link1Ratio: Float = 0f
+    private var loadingLink1Bitmap: Boolean = false
+    private var bitmapLink1: Bitmap? = null
 
     private val textScale = 0.08f
     private val startX = -0.98f
@@ -334,6 +335,7 @@ class Texture2DProgram {
      * @param texBuffer Buffer with vertex texture data.
      * @param texStride Width, in bytes, of the texture data for each vertex.
      */
+    @OptIn(DelicateCoroutinesApi::class)
     fun draw(
         context: Context,
         mvpMatrix: FloatArray, vertexBuffer: FloatBuffer, logoVertexBuffer: FloatBuffer, firstVertex: Int,
@@ -424,15 +426,20 @@ class Texture2DProgram {
         GlUtils.checkGlError("glDrawArrays logo")
 
         // Link 1 PNG
-        if (LINK1.isNotEmpty()) {
-            if (link1TextureId == -1 || LINK1 != OLD_LINK1) {
-                val bitmap = loadBitmapFromUrl(LINK1)
-                if (bitmap != null) {
-                    val (id, ratio) = loadTextureFromBitmap(bitmap)
-                    link1TextureId = id
-                    link1Ratio = ratio
+        if (LINK1.isNotEmpty() && !loadingLink1Bitmap) {
+            if (bitmapLink1 == null || LINK1 != OLD_LINK1) {
+                GlobalScope.launch(Dispatchers.IO) {
+                    link1TextureId = -1
+                    loadingLink1Bitmap = true
+                    bitmapLink1 = loadBitmapFromUrl(LINK1)
+                    loadingLink1Bitmap = false
                     OLD_LINK1 = LINK1
                 }
+            }
+            if (bitmapLink1 != null && link1TextureId == -1) {
+                val (id, ratio) = loadTextureFromBitmap(bitmapLink1!!)
+                link1TextureId = id
+                link1Ratio = ratio
             }
 
             if (link1TextureId != -1) {
@@ -909,7 +916,7 @@ class Texture2DProgram {
         var TURN2 = ""
         var OLD_TURN2 = ""
 
-        var LINK1 = ""
+        var LINK1 = "https://firebasestorage.googleapis.com/v0/b/colorc-e314d.appspot.com/o/sc%2FVitri_1.png?alt=media&token=8c1050c9-9c7c-4ad5-bb7d-6e6c748ab4b7"
         var OLD_LINK1 = ""
 
         // Simple vertex shader, used for all programs.
