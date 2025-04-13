@@ -460,11 +460,12 @@ class Texture2DProgram {
                 }
 
                 // Adjust Logo Position
-                val scale = 0.2f
-                val horizontalScale = scale * link1Ratio
+                val scale = 0.12f
+                var horizontalScale = scale * link1Ratio
+                horizontalScale -= (horizontalScale * 0.01f)
                 val link1MvpMatrix = FloatArray(16)
                 Matrix.setIdentityM(link1MvpMatrix, 0)
-                Matrix.translateM(link1MvpMatrix, 0, 0.85f - horizontalScale, 0.85f, 0f) // Adjust position (top-right corner)
+                Matrix.translateM(link1MvpMatrix, 0, 0.85f - (0.117f / 2) - (horizontalScale / 2), 0.85f, 0f) // Adjust position (top-right corner)
                 Matrix.scaleM(link1MvpMatrix, 0, horizontalScale, scale, 1f)  // Scale down logo
 
                 GLES20.glUniformMatrix4fv(uLink1MVPMatrixLoc, 1, false, link1MvpMatrix, 0)
