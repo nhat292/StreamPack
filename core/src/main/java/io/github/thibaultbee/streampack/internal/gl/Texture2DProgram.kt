@@ -125,6 +125,7 @@ class Texture2DProgram {
     private val startX = -0.98f
     private val startY = 0.8f
     private val spacing = 0.075f
+    private val fixedScale = 0.05f
 
     init {
         programHandle = createProgram(VERTEX_SHADER, FRAGMENT_SHADER_EXT)
@@ -450,10 +451,13 @@ class Texture2DProgram {
         }
 
         // Adjust Logo Position
+        val logoScale = 0.2f
+        var logoHorizontalScale = logoScale * logoRatio
+        logoHorizontalScale -= (logoHorizontalScale * fixedScale)
         val logoMvpMatrix = FloatArray(16)
         Matrix.setIdentityM(logoMvpMatrix, 0)
         Matrix.translateM(logoMvpMatrix, 0, 0.85f, 0.85f, 0f) // Adjust position (top-right corner)
-        Matrix.scaleM(logoMvpMatrix, 0, 0.117f, 0.2f, 1f)  // Scale down logo
+        Matrix.scaleM(logoMvpMatrix, 0, logoHorizontalScale, logoScale, 1f)  // Scale down logo
 
         GLES20.glUniformMatrix4fv(uLogoMVPMatrixLoc, 1, false, logoMvpMatrix, 0)
         GlUtils.checkGlError("glUniformMatrix4fv logo")
@@ -508,7 +512,7 @@ class Texture2DProgram {
                 // Adjust Logo Position
                 val scale = 0.11f
                 var horizontalScale = scale * link1Ratio
-                horizontalScale -= (horizontalScale * 0.02f)
+                horizontalScale -= (horizontalScale * fixedScale)
                 val link1MvpMatrix = FloatArray(16)
                 Matrix.setIdentityM(link1MvpMatrix, 0)
                 Matrix.translateM(link1MvpMatrix, 0, 0.85f - (0.117f / 2) - (horizontalScale / 2) - 0.05f, 0.85f, 0f) // Adjust position (top-right corner)
@@ -569,7 +573,7 @@ class Texture2DProgram {
                 // Adjust Logo Position
                 val scale = 0.11f
                 var horizontalScale = scale * link2Ratio
-                horizontalScale -= (horizontalScale * 0.02f)
+                horizontalScale -= (horizontalScale * fixedScale)
                 val link2MvpMatrix = FloatArray(16)
                 Matrix.setIdentityM(link2MvpMatrix, 0)
                 Matrix.translateM(link2MvpMatrix, 0, startX + (horizontalScale / 2), -0.85f, 0f) // Adjust position (top-right corner)
@@ -630,7 +634,7 @@ class Texture2DProgram {
                 // Adjust Logo Position
                 val scale = 0.11f
                 var horizontalScale = scale * link3Ratio
-                horizontalScale -= (horizontalScale * 0.02f)
+                horizontalScale -= (horizontalScale * fixedScale)
                 val link3MvpMatrix = FloatArray(16)
                 Matrix.setIdentityM(link3MvpMatrix, 0)
                 Matrix.translateM(link3MvpMatrix, 0, 0.98f - (horizontalScale / 2), -0.85f, 0f) // Adjust position (top-right corner)
@@ -680,7 +684,7 @@ class Texture2DProgram {
                 GlUtils.checkGlError("glUniform1i")
             }
             var horizontalScale = textScale * textRatio
-            horizontalScale -= (horizontalScale * 0.008f)
+            horizontalScale -= (horizontalScale * fixedScale)
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
             Matrix.translateM(textMvpMatrix, 0, startX + (horizontalScale / 2), startY - spacing, 0f)  // Top-left corner
@@ -727,7 +731,7 @@ class Texture2DProgram {
                 GlUtils.checkGlError("glUniform1i")
             }
             var horizontalScale = textScale * text2Ratio
-            horizontalScale -= (horizontalScale * 0.008f)
+            horizontalScale -= (horizontalScale * fixedScale)
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
             Matrix.translateM(textMvpMatrix, 0, startX + (horizontalScale / 2), startY - (2 * spacing), 0f)  // Top-left corner
@@ -772,7 +776,7 @@ class Texture2DProgram {
                 GlUtils.checkGlError("glUniform1i")
             }
             var horizontalScale = textScale * text3Ratio
-            horizontalScale -= (horizontalScale * 0.008f)
+            horizontalScale -= (horizontalScale * fixedScale)
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
             Matrix.translateM(textMvpMatrix, 0, startX + (horizontalScale / 2), startY, 0f)  // Top-left corner
@@ -817,7 +821,7 @@ class Texture2DProgram {
                 GlUtils.checkGlError("glUniform1i")
             }
             var horizontalScale = textScale * text4Ratio
-            horizontalScale -= (horizontalScale * 0.008f)
+            horizontalScale -= (horizontalScale * fixedScale)
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
             Matrix.translateM(textMvpMatrix, 0, startX + (horizontalScale / 2), startY - (3 * spacing), 0f)  // Top-left corner
