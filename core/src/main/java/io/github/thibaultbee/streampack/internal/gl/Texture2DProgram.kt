@@ -125,7 +125,7 @@ class Texture2DProgram {
     private val startX = -0.98f
     private val startY = 0.8f
     private val spacing = 0.075f
-    private val fixedScale = 0.2f
+    private val fixedScale = 0.3f
 
     init {
         programHandle = createProgram(VERTEX_SHADER, FRAGMENT_SHADER_EXT)
@@ -453,7 +453,7 @@ class Texture2DProgram {
         // Adjust Logo Position
         val logoScale = 0.2f
         var logoHorizontalScale = logoScale * logoRatio
-        logoHorizontalScale -= (logoHorizontalScale * fixedScale)
+        logoHorizontalScale -= (logoHorizontalScale * 0.4f)
         val logoMvpMatrix = FloatArray(16)
         Matrix.setIdentityM(logoMvpMatrix, 0)
         Matrix.translateM(logoMvpMatrix, 0, 0.85f, 0.85f, 0f) // Adjust position (top-right corner)
