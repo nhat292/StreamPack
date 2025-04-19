@@ -453,7 +453,7 @@ class Texture2DProgram {
         // Adjust Logo Position
         val logoScale = 0.2f
         var logoHorizontalScale = logoScale * logoRatio
-        logoHorizontalScale -= (logoHorizontalScale * 0.4f)
+        logoHorizontalScale -= (logoHorizontalScale * 0.5f)
         val logoMvpMatrix = FloatArray(16)
         Matrix.setIdentityM(logoMvpMatrix, 0)
         Matrix.translateM(logoMvpMatrix, 0, 0.85f, 0.85f, 0f) // Adjust position (top-right corner)
