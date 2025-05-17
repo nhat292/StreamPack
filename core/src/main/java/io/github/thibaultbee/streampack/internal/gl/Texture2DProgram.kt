@@ -125,7 +125,7 @@ class Texture2DProgram {
     private val startX = -0.98f
     private val startY = 0.8f
     private val spacing = 0.075f
-    private val fixedScale = 0.7f
+    private val fixedScale = 0.6f
 
     init {
         programHandle = createProgram(VERTEX_SHADER, FRAGMENT_SHADER_EXT)
