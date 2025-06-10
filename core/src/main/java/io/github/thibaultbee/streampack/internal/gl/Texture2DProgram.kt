@@ -1095,6 +1095,18 @@ class Texture2DProgram {
         var LINK3 = ""
         var OLD_LINK3 = ""
 
+        var MATCH_SCORE1 = ""
+        var OLD_MATCH_SCORE1 = ""
+
+        var MATCH_SCORE2 = ""
+        var OLD_MATCH_SCORE2 = ""
+
+        var POINT1 = ""
+        var OLD_POINT1 = ""
+
+        var POINT2 = ""
+        var OLD_POINT2 = ""
+
         // Simple vertex shader, used for all programs.
         private const val VERTEX_SHADER = """uniform mat4 uMVPMatrix;
     uniform mat4 uTexMatrix;
