@@ -658,12 +658,14 @@ class Texture2DProgram {
         // Create text
 
         if (TEXT1.isNotEmpty()) {
-            if (textTextureId == -1 || OLD_TEXT1 != TEXT1 || OLD_SCORE1 != SCORE1 || OLD_TURN1 != TURN1) {
-                val (id, ratio) = createTextTexture(TEXT1, 30f, Color.WHITE, getMaxLengthText(), SCORE1, TURN1)
+            if (textTextureId == -1 || OLD_TEXT1 != TEXT1 || OLD_MATCH_SCORE1 != MATCH_SCORE1 || OLD_TURN1 != TURN1 || OLD_SCORE1 != SCORE1|| OLD_POINT1 != POINT1) {
+                val (id, ratio) = createTextTexture(TEXT1, 30f, Color.WHITE, getMaxLengthText(), MATCH_SCORE1, SCORE1, POINT1, TURN1)
                 textTextureId = id
                 textRatio = ratio
                 OLD_TEXT1 = TEXT1
+                OLD_MATCH_SCORE1 = MATCH_SCORE1
                 OLD_SCORE1 = SCORE1
+                OLD_POINT1 = POINT1
                 OLD_TURN1 = TURN1
             }
             GLES20.glUseProgram(textProgramHandle)
@@ -704,12 +706,14 @@ class Texture2DProgram {
 
         // Create text
         if (TEXT2.isNotEmpty()) {
-            if (text2TextureId == -1 || OLD_TEXT2 != TEXT2 || OLD_SCORE2 != SCORE2 || OLD_TURN2 != TURN2) {
-                val (id, ratio)  = createTextTexture(TEXT2, 30f, Color.WHITE, getMaxLengthText(), SCORE2, TURN2)
+            if (text2TextureId == -1 || OLD_TEXT2 != TEXT2 || OLD_MATCH_SCORE2 != MATCH_SCORE2 || OLD_TURN2 != TURN2 || OLD_SCORE2 != SCORE2||OLD_POINT2 != POINT2) {
+                val (id, ratio)  = createTextTexture(TEXT2, 30f, Color.WHITE, getMaxLengthText(), MATCH_SCORE2, SCORE2, POINT2, TURN2)
                 text2TextureId = id
                 text2Ratio = ratio
                 OLD_TEXT2 = TEXT2
+                OLD_MATCH_SCORE2 = MATCH_SCORE2
                 OLD_SCORE2 = SCORE2
+                OLD_POINT2 = POINT2
                 OLD_TURN2 = TURN2
             }
             GLES20.glUseProgram(text2ProgramHandle)
@@ -889,45 +893,50 @@ class Texture2DProgram {
         return Pair(textureHandle[0], ratio)
     }
 
-    private fun createTextTexture(text: String, size: Float, textColor: Int, maxLengthText: String? = null, score: String? = null, turn: String? = null): Pair<Int, Float>  {
-        // Create a bitmap with room for the text
-        val paint = Paint().apply {
-            textSize = size
-            color = textColor
-            isAntiAlias = true
-            typeface = Typeface.DEFAULT_BOLD
-            textAlign = Paint.Align.LEFT
-        }
+    private fun createTextTexture(
+        text: String,
+        size: Float,
+        textColor: Int,
+        maxLengthText: String? = null,
+        matchScore: String? = null,
+        score: String? = null,
+        point: String? = null,
+        turn: String? = null
+    ): Pair<Int, Float> {
 
-        val scorePaint = Paint().apply {
-            textSize = size
-            color = Color.parseColor("#13235B")
-            isAntiAlias = true
-            typeface = Typeface.DEFAULT_BOLD
-            textAlign = Paint.Align.CENTER
-        }
+        fun createTextPaint(color: Int, align: Paint.Align = Paint.Align.LEFT): Paint =
+            Paint().apply {
+                this.textSize = size
+                this.color = color
+                isAntiAlias = true
+                typeface = Typeface.DEFAULT_BOLD
+                textAlign = align
+            }
 
-        val turnPaint = Paint().apply {
-            textSize = size
-            color = textColor
-            isAntiAlias = true
-            typeface = Typeface.DEFAULT_BOLD
-            textAlign = Paint.Align.CENTER
-        }
+        fun createBgPaint(color: Int): Paint =
+            Paint().apply {
+                this.color = color
+                style = Paint.Style.FILL
+                isAntiAlias = true
+            }
 
-        val backgroundPaint = Paint().apply {
-            color = Color.parseColor("#13235B")
-            style = Paint.Style.FILL
-            isAntiAlias = true
-        }
+        fun measureTextWidth(paint: Paint, sample: String): Int =
+            Rect().apply { paint.getTextBounds(sample, 0, sample.length, this) }.width()
 
-        val scoreBackgroundPaint = Paint().apply {
-            color = Color.WHITE
-            style = Paint.Style.FILL
-            isAntiAlias = true
-        }
-
+        val padding = 14f
         val borderWidth = 2f
+        val contentText = maxLengthText ?: text
+
+        val mainTextPaint = createTextPaint(textColor)
+        val mainBgPaint = createBgPaint(Color.parseColor("#13235B"))
+        val matchScorePaint = createTextPaint(Color.BLACK, Paint.Align.CENTER)
+        val matchScoreBgPaint = createBgPaint(Color.WHITE)
+        val scorePaint = createTextPaint(Color.WHITE, Paint.Align.CENTER)
+        val scoreBgPaint = createBgPaint(Color.parseColor("#064C9B"))
+        val pointPaint = createTextPaint(Color.RED, Paint.Align.CENTER)
+        val pointBgPaint = createBgPaint(Color.YELLOW)
+        val turnPaint = createTextPaint(textColor, Paint.Align.CENTER)
+
         val borderPaint = Paint().apply {
             color = Color.GRAY
             style = Paint.Style.STROKE
@@ -935,86 +944,72 @@ class Texture2DProgram {
             isAntiAlias = true
         }
 
-        // Measure text dimensions
-        val textBounds = Rect()
-        var t = text
-        if (maxLengthText != null) {
-            t = maxLengthText
+        val textBounds = Rect().apply {
+            mainTextPaint.getTextBounds(contentText, 0, contentText.length, this)
         }
-        paint.getTextBounds(t, 0, t.length, textBounds)
-        val textWidth =  textBounds.width()
+        val textHeight = textBounds.height()
+        val textWidth = textBounds.width()
 
-        var scoreTextWidth = 0
-        if (score != null) {
-            val scoreText = "000"
-            val scoreTextBounds = Rect()
-            paint.getTextBounds(scoreText, 0, scoreText.length, scoreTextBounds)
-            scoreTextWidth = scoreTextBounds.width()
-        }
+        val widths = mutableMapOf<String, Int>()
 
-        var turnTextWidth = 0
-        if (score != null) {
-            val turnText = "000"
-            val turnTextBounds = Rect()
-            paint.getTextBounds(turnText, 0, turnText.length, turnTextBounds)
-            turnTextWidth = turnTextBounds.width()
-        }
+        matchScore?.let { widths["matchScore"] = measureTextWidth(mainTextPaint, "000") }
+        score?.let { widths["score"] = measureTextWidth(mainTextPaint, "000") }
+        point?.let { widths["point"] = measureTextWidth(mainTextPaint, "0000") }
+        turn?.let { widths["turn"] = measureTextWidth(mainTextPaint, "000") }
 
-        val padding = 14f
-        val width = textBounds.width() + (padding * 2) + (borderWidth * 2) + scoreTextWidth + turnTextWidth
-        val height = textBounds.height() + (padding * 2) + (borderWidth * 2)
+        val totalExtraWidth = widths.values.sum()
+        val width = textWidth + totalExtraWidth + (padding * 2) + (borderWidth * 2)
+        val height = textHeight + (padding * 2) + (borderWidth * 2)
 
-        // Create a bitmap and draw text on it
         val bitmap = Bitmap.createBitmap(width.toInt(), height.toInt(), Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
-        val bgRect = RectF(
-            borderWidth,
-            borderWidth,
-            width - borderWidth,
-            height - borderWidth
+
+        // Draw background
+        canvas.drawRect(
+            RectF(borderWidth, borderWidth, width - borderWidth, height - borderWidth),
+            mainBgPaint
         )
-        canvas.drawRect(bgRect, backgroundPaint)
-        if (score != null) {
-            val scoreBgRect = RectF(
-                borderWidth + textWidth + turnTextWidth + (2 * padding),
-                borderWidth,
-                width - borderWidth,
-                height - borderWidth
-            )
-            canvas.drawRect(scoreBgRect, scoreBackgroundPaint)
-        }
-        val borderRect = RectF(
-            borderWidth / 2,
-            borderWidth / 2,
-            width - borderWidth / 2,
-            height - borderWidth / 2
-        )
-        canvas.drawRect(borderRect, borderPaint)
-        canvas.drawText(text, padding + borderWidth, height - padding - textBounds.bottom - borderWidth, paint)
-        if (score != null) {
-            canvas.drawText("$score", borderWidth + textWidth + turnTextWidth + (2 * padding) + (scoreTextWidth / 2), height - padding - textBounds.bottom - borderWidth, scorePaint)
+
+        var cursorX = padding + borderWidth
+        val baselineY = height - padding - textBounds.bottom - borderWidth
+
+        // Draw main text
+        canvas.drawText(text, cursorX, baselineY, mainTextPaint)
+        cursorX += textWidth
+
+        fun drawBlock(value: String?, widthKey: String, bgPaint: Paint, textPaint: Paint) {
+            if (value != null) {
+                cursorX += padding
+                val blockWidth = widths[widthKey]?.toFloat() ?: return
+                val rect = RectF(cursorX, borderWidth, cursorX + blockWidth, height - borderWidth)
+                canvas.drawRect(rect, bgPaint)
+                canvas.drawText(value, rect.centerX(), baselineY, textPaint)
+                cursorX += blockWidth
+            }
         }
 
-        if (turn != null) {
-            canvas.drawText("$turn", borderWidth + textWidth + (2 * padding) + (turnTextWidth / 2), height - padding - textBounds.bottom - borderWidth, turnPaint)
-        }
+        drawBlock(turn, "turn", mainBgPaint, turnPaint)
+        drawBlock(matchScore, "matchScore", matchScoreBgPaint, matchScorePaint)
+        drawBlock(score, "score", scoreBgPaint, scorePaint)
+        drawBlock(point, "point", pointBgPaint, pointPaint)
 
-        // Create an OpenGL texture
+        // Draw border
+        canvas.drawRect(
+            RectF(borderWidth / 2, borderWidth / 2, width - borderWidth / 2, height - borderWidth / 2),
+            borderPaint
+        )
+
+        // Create texture
         val textureHandle = IntArray(1)
         GLES20.glGenTextures(1, textureHandle, 0)
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0])
-
-        // Set texture parameters
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR)
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR)
-
-        // Upload bitmap to texture
         GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0)
 
-        // Clean up
         bitmap.recycle()
 
-        return Pair(textureHandle[0], (width / height))
+        return Pair(textureHandle[0], width / height)
     }
 
     private fun getMaxLengthText(): String? {
@@ -1101,11 +1096,11 @@ class Texture2DProgram {
         var MATCH_SCORE2 = ""
         var OLD_MATCH_SCORE2 = ""
 
-        var POINT1 = ""
-        var OLD_POINT1 = ""
+        var POINT1: String? = null
+        var OLD_POINT1: String? = null
 
-        var POINT2 = ""
-        var OLD_POINT2 = ""
+        var POINT2: String? = null
+        var OLD_POINT2: String? = null
 
         // Simple vertex shader, used for all programs.
         private const val VERTEX_SHADER = """uniform mat4 uMVPMatrix;
