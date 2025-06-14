@@ -36,6 +36,7 @@ import kotlinx.coroutines.*
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import kotlin.math.min
 
 /**
  * GL program and supporting functions for textured 2D shapes.
@@ -985,7 +986,23 @@ class Texture2DProgram {
                 val blockWidth = widths[widthKey]?.toFloat() ?: return
                 val rect = RectF(cursorX, borderWidth, cursorX + blockWidth, height - borderWidth)
                 canvas.drawRect(rect, bgPaint)
-                canvas.drawText(value, rect.centerX(), baselineY, textPaint)
+
+                if (widthKey == "turn" && IS_TENNIS) {
+                    // Draw a circle in the center of the block
+                    val turnCirclePaint = Paint(turnPaint).apply {
+                        style = Paint.Style.STROKE
+                        strokeWidth = 3f
+                        color = Color.GREEN
+                    }
+                    val cx = rect.centerX()
+                    val cy = rect.centerY()
+                    val radius = min(rect.width(), rect.height()) / 2.5f
+                    canvas.drawCircle(cx, cy, radius, turnCirclePaint)
+                } else {
+                    // Draw text centered in the block
+                    canvas.drawText(value, rect.centerX(), baselineY, textPaint)
+                }
+
                 cursorX += blockWidth
             }
         }
@@ -1103,6 +1120,8 @@ class Texture2DProgram {
 
         var POINT2: String? = null
         var OLD_POINT2: String? = null
+
+        var IS_TENNIS = false
 
         // Simple vertex shader, used for all programs.
         private const val VERTEX_SHADER = """uniform mat4 uMVPMatrix;
