@@ -32,7 +32,7 @@ import java.nio.FloatBuffer
 /**
  * Optimized GL program for textured 2D shapes with overlay support.
  */
-class OptimizedTexture2DProgram {
+class Texture2DProgram {
 
     // Data classes for better organization
     data class ShaderProgram(
