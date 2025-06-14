@@ -977,9 +977,11 @@ class Texture2DProgram {
         canvas.drawText(text, cursorX, baselineY, mainTextPaint)
         cursorX += textWidth
 
-        fun drawBlock(value: String?, widthKey: String, bgPaint: Paint, textPaint: Paint) {
+        fun drawBlock(value: String?, widthKey: String, bgPaint: Paint, textPaint: Paint, addPadding: Boolean = false) {
             if (value != null) {
-                cursorX += padding
+                if (addPadding) {
+                    cursorX += padding
+                }
                 val blockWidth = widths[widthKey]?.toFloat() ?: return
                 val rect = RectF(cursorX, borderWidth, cursorX + blockWidth, height - borderWidth)
                 canvas.drawRect(rect, bgPaint)
@@ -988,7 +990,7 @@ class Texture2DProgram {
             }
         }
 
-        drawBlock(turn, "turn", mainBgPaint, turnPaint)
+        drawBlock(turn, "turn", mainBgPaint, turnPaint, true)
         drawBlock(matchScore, "matchScore", matchScoreBgPaint, matchScorePaint)
         drawBlock(score, "score", scoreBgPaint, scorePaint)
         drawBlock(point, "point", pointBgPaint, pointPaint)
