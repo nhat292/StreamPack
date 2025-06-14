@@ -987,16 +987,15 @@ class Texture2DProgram {
                 val rect = RectF(cursorX, borderWidth, cursorX + blockWidth, height - borderWidth)
                 canvas.drawRect(rect, bgPaint)
 
-                if (widthKey == "turn" && IS_TENNIS) {
+                if (widthKey == "turn" && IS_TENNIS && value.isNotEmpty()) {
                     // Draw a circle in the center of the block
                     val turnCirclePaint = Paint(turnPaint).apply {
-                        style = Paint.Style.STROKE
-                        strokeWidth = 3f
+                        style = Paint.Style.FILL
                         color = Color.GREEN
                     }
                     val cx = rect.centerX()
                     val cy = rect.centerY()
-                    val radius = min(rect.width(), rect.height()) / 2.5f
+                    val radius = min(rect.width(), rect.height()) / 3.5f
                     canvas.drawCircle(cx, cy, radius, turnCirclePaint)
                 } else {
                     // Draw text centered in the block
