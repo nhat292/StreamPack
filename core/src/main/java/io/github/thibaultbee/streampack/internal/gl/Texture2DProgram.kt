@@ -659,8 +659,8 @@ class Texture2DProgram {
         // Create text
 
         if (TEXT1.isNotEmpty()) {
-            if (textTextureId == -1 || OLD_TEXT1 != TEXT1 || OLD_MATCH_SCORE1 != MATCH_SCORE1 || OLD_TURN1 != TURN1 || OLD_SCORE1 != SCORE1|| OLD_POINT1 != POINT1) {
-                val (id, ratio) = createTextTexture(TEXT1, 30f, Color.WHITE, getMaxLengthText(), MATCH_SCORE1, SCORE1, POINT1, TURN1)
+            if (textTextureId == -1 || OLD_TEXT1 != TEXT1 || OLD_MATCH_SCORE1 != MATCH_SCORE1 || OLD_TURN1 != TURN1 || OLD_SCORE1 != SCORE1|| OLD_POINT1 != POINT1 || OLD_TB_SCORE1 != TB_SCORE1) {
+                val (id, ratio) = createTextTexture(TEXT1, 30f, Color.WHITE, getMaxLengthText(), MATCH_SCORE1, SCORE1, POINT1, TURN1, TB_SCORE1)
                 textTextureId = id
                 textRatio = ratio
                 OLD_TEXT1 = TEXT1
@@ -668,6 +668,7 @@ class Texture2DProgram {
                 OLD_SCORE1 = SCORE1
                 OLD_POINT1 = POINT1
                 OLD_TURN1 = TURN1
+                OLD_TB_SCORE1 = TB_SCORE1
             }
             GLES20.glUseProgram(textProgramHandle)
             GlUtils.checkGlError("glUseProgram text")
@@ -707,8 +708,8 @@ class Texture2DProgram {
 
         // Create text
         if (TEXT2.isNotEmpty()) {
-            if (text2TextureId == -1 || OLD_TEXT2 != TEXT2 || OLD_MATCH_SCORE2 != MATCH_SCORE2 || OLD_TURN2 != TURN2 || OLD_SCORE2 != SCORE2||OLD_POINT2 != POINT2) {
-                val (id, ratio)  = createTextTexture(TEXT2, 30f, Color.WHITE, getMaxLengthText(), MATCH_SCORE2, SCORE2, POINT2, TURN2)
+            if (text2TextureId == -1 || OLD_TEXT2 != TEXT2 || OLD_MATCH_SCORE2 != MATCH_SCORE2 || OLD_TURN2 != TURN2 || OLD_SCORE2 != SCORE2 || OLD_POINT2 != POINT2 || OLD_TB_SCORE2 != TB_SCORE2) {
+                val (id, ratio)  = createTextTexture(TEXT2, 30f, Color.WHITE, getMaxLengthText(), MATCH_SCORE2, SCORE2, POINT2, TURN2, TB_SCORE2)
                 text2TextureId = id
                 text2Ratio = ratio
                 OLD_TEXT2 = TEXT2
@@ -716,6 +717,7 @@ class Texture2DProgram {
                 OLD_SCORE2 = SCORE2
                 OLD_POINT2 = POINT2
                 OLD_TURN2 = TURN2
+                OLD_TB_SCORE2 = TB_SCORE2
             }
             GLES20.glUseProgram(text2ProgramHandle)
             GlUtils.checkGlError("glUseProgram text")
@@ -902,7 +904,8 @@ class Texture2DProgram {
         matchScore: String? = null,
         score: String? = null,
         point: String? = null,
-        turn: String? = null
+        turn: String? = null,
+        tieBreakScore: String? = null,
     ): Pair<Int, Float> {
 
         fun createTextPaint(color: Int, align: Paint.Align = Paint.Align.LEFT): Paint =
@@ -937,6 +940,8 @@ class Texture2DProgram {
         val pointPaint = createTextPaint(Color.RED, Paint.Align.CENTER)
         val pointBgPaint = createBgPaint(Color.YELLOW)
         val turnPaint = createTextPaint(textColor, Paint.Align.CENTER)
+        val tieBreakPaint = createTextPaint(Color.WHITE, Paint.Align.CENTER)
+        val tieBreakBgPaint = createBgPaint(Color.RED)
 
         val borderPaint = Paint().apply {
             color = Color.GRAY
@@ -957,6 +962,7 @@ class Texture2DProgram {
         score?.let { widths["score"] = measureTextWidth(mainTextPaint, "000") }
         point?.let { widths["point"] = measureTextWidth(mainTextPaint, "0000") }
         turn?.let { widths["turn"] = measureTextWidth(mainTextPaint, "000") }
+        tieBreakScore?.let { widths["tieBreakScore"] = measureTextWidth(mainTextPaint, "000") }
 
         val totalExtraWidth = widths.values.sum()
         val width = textWidth + totalExtraWidth + (padding * 2) + (borderWidth * 2)
@@ -1010,6 +1016,7 @@ class Texture2DProgram {
         drawBlock(matchScore, "matchScore", matchScoreBgPaint, matchScorePaint)
         drawBlock(score, "score", scoreBgPaint, scorePaint)
         drawBlock(point, "point", pointBgPaint, pointPaint)
+        drawBlock(tieBreakScore, "tieBreakScore", tieBreakBgPaint, tieBreakPaint)
 
         // Draw border
         canvas.drawRect(
@@ -1119,6 +1126,12 @@ class Texture2DProgram {
 
         var POINT2: String? = null
         var OLD_POINT2: String? = null
+
+        var TB_SCORE1: String? = null
+        var OLD_TB_SCORE1: String? = null
+
+        var TB_SCORE2: String? = null
+        var OLD_TB_SCORE2: String? = null
 
         var IS_TENNIS = false
 
