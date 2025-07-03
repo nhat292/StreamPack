@@ -511,7 +511,7 @@ class Texture2DProgram {
                 }
 
                 // Adjust Logo Position
-                val scale = 0.11f
+                val scale = 0.2f
                 val horizontalScale = (scale * link1Ratio) * fixedScale
                 val link1MvpMatrix = FloatArray(16)
                 Matrix.setIdentityM(link1MvpMatrix, 0)
@@ -571,7 +571,7 @@ class Texture2DProgram {
                 }
 
                 // Adjust Logo Position
-                val scale = 0.11f
+                val scale = 0.2f
                 val horizontalScale = (scale * link2Ratio) * fixedScale
                 val link2MvpMatrix = FloatArray(16)
                 Matrix.setIdentityM(link2MvpMatrix, 0)
@@ -631,7 +631,7 @@ class Texture2DProgram {
                 }
 
                 // Adjust Logo Position
-                val scale = 0.11f
+                val scale = 0.2f
                 val horizontalScale = (scale * link3Ratio) * fixedScale
                 val link3MvpMatrix = FloatArray(16)
                 Matrix.setIdentityM(link3MvpMatrix, 0)
