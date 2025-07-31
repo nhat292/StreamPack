@@ -17,7 +17,9 @@ package io.github.thibaultbee.streampack.internal.sources.camera
 
 import android.Manifest
 import android.content.Context
+import android.graphics.Rect
 import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.CaptureRequest
 import android.util.Size
 import android.view.Surface
 import androidx.annotation.RequiresPermission
@@ -33,6 +35,7 @@ import io.github.thibaultbee.streampack.internal.utils.extensions.portraitize
 import io.github.thibaultbee.streampack.utils.CameraSettings
 import io.github.thibaultbee.streampack.utils.cameraList
 import io.github.thibaultbee.streampack.utils.defaultCameraId
+import io.github.thibaultbee.streampack.utils.getCameraCharacteristics
 import io.github.thibaultbee.streampack.utils.getFacingDirection
 import io.github.thibaultbee.streampack.utils.isFrameRateSupported
 import kotlinx.coroutines.runBlocking
@@ -128,6 +131,28 @@ class CameraSource(
             cameraController.removeTarget(encoderSurface!!)
         }
     }
+
+    fun setZoom(zoom: Float) {
+        val cameraCharacteristics = context.getCameraCharacteristics(cameraId)
+        val maxZoom = cameraCharacteristics.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM) ?: 1.0f
+        val clampedZoom = zoom.coerceIn(1.0f, maxZoom)
+
+        val sensorRect = cameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE) ?: return
+        val centerX = sensorRect.centerX()
+        val centerY = sensorRect.centerY()
+        val deltaX = (0.5f * sensorRect.width() / clampedZoom).toInt()
+        val deltaY = (0.5f * sensorRect.height() / clampedZoom).toInt()
+        val zoomRect = Rect(centerX - deltaX, centerY - deltaY, centerX + deltaX, centerY + deltaY)
+
+        cameraController.captureRequest?.set(CaptureRequest.SCALER_CROP_REGION, zoomRect)
+        cameraController.captureSession?.setRepeatingRequest(cameraController.captureRequest!!.build(), null, null)
+    }
+
+    fun getMaxZoom(): Float {
+        val cameraCharacteristics = context.getCameraCharacteristics(cameraId)
+        return cameraCharacteristics.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM) ?: 1.0f
+    }
+
 
     override fun release() {
         cameraController.release()

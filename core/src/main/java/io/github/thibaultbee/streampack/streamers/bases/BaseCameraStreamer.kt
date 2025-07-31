@@ -123,6 +123,24 @@ open class BaseCameraStreamer(
     }
 
     /**
+    * Set camera zoom level.
+    *
+    * @param zoom [Float] value between 1.0 and max zoom supported by the camera.
+    */
+    fun setZoom(zoom: Float) {
+        cameraSource.setZoom(zoom)
+    }
+
+    /**
+     * Get camera max zoom level.
+     *
+     * @return maxZoom [Float]
+     */
+    fun getMaxZoom(): Float {
+        return cameraSource.getMaxZoom()
+    }
+
+    /**
      * Same as [BaseStreamer.release] but it also calls [stopPreview].
      */
     override fun release() {

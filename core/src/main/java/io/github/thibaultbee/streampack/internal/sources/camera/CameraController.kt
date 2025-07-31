@@ -41,8 +41,8 @@ class CameraController(
     val cameraId: String?
         get() = camera?.id
 
-    private var captureSession: CameraCaptureSession? = null
-    private var captureRequest: CaptureRequest.Builder? = null
+    var captureSession: CameraCaptureSession? = null
+    var captureRequest: CaptureRequest.Builder? = null
 
     private val threadManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
         CameraExecutorManager()
