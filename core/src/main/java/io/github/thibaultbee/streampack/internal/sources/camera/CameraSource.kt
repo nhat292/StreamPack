@@ -38,6 +38,10 @@ import io.github.thibaultbee.streampack.utils.defaultCameraId
 import io.github.thibaultbee.streampack.utils.getCameraCharacteristics
 import io.github.thibaultbee.streampack.utils.getFacingDirection
 import io.github.thibaultbee.streampack.utils.isFrameRateSupported
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.nio.ByteBuffer
 import kotlin.math.max
@@ -68,6 +72,7 @@ class CameraSource(
         }
     private var cameraController = CameraController(context)
     val settings = CameraSettings(context, cameraController)
+    var currentZoom = 1.0f
 
     override val timestampOffset = CameraHelper.getTimeOffsetToMonoClock(context, cameraId)
     override val hasSurface = true
@@ -137,11 +142,28 @@ class CameraSource(
         val maxZoom = cameraCharacteristics.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM) ?: 1.0f
         val clampedZoom = zoom.coerceIn(1.0f, maxZoom)
 
+        val startZoom = currentZoom
+        val steps = 10 // number of smooth steps
+        val stepSize = (clampedZoom - startZoom) / steps
+        val delayPerStep = 300L / steps
+
+        CoroutineScope(Dispatchers.Main).launch {
+            for (i in 1..steps) {
+                val newZoom = startZoom + (stepSize * i)
+                applyZoom(newZoom)
+                delay(delayPerStep)
+            }
+            currentZoom = clampedZoom
+        }
+    }
+
+    private fun applyZoom(zoom: Float) {
+        val cameraCharacteristics = context.getCameraCharacteristics(cameraId)
         val sensorRect = cameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE) ?: return
         val centerX = sensorRect.centerX()
         val centerY = sensorRect.centerY()
-        val deltaX = (0.5f * sensorRect.width() / clampedZoom).toInt()
-        val deltaY = (0.5f * sensorRect.height() / clampedZoom).toInt()
+        val deltaX = (0.5f * sensorRect.width() / zoom).toInt()
+        val deltaY = (0.5f * sensorRect.height() / zoom).toInt()
         val zoomRect = Rect(centerX - deltaX, centerY - deltaY, centerX + deltaX, centerY + deltaY)
 
         cameraController.captureRequest?.set(CaptureRequest.SCALER_CROP_REGION, zoomRect)
