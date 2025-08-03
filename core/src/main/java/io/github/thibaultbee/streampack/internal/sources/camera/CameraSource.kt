@@ -21,6 +21,7 @@ import android.graphics.Rect
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CaptureRequest
 import android.os.Build
+import android.util.Log
 import android.util.Size
 import android.view.Surface
 import androidx.annotation.RequiresPermission
@@ -157,26 +158,26 @@ class CameraSource(
     }
 
     private fun applyZoom(zoom: Float) {
+        val builder = cameraController.captureRequest ?: return
+        val session = cameraController.captureSession ?: return
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            cameraController.captureRequest?.set(CaptureRequest.CONTROL_ZOOM_RATIO, zoom)
-            cameraController.captureSession?.setRepeatingRequest(
-                cameraController.captureRequest!!.build(),
-                null,
-                null
-            )
+            builder.set(CaptureRequest.CONTROL_ZOOM_RATIO, zoom)
         } else {
-            val cameraCharacteristics = context.getCameraCharacteristics(cameraId)
-            val sensorRect = cameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE) ?: return
+            val characteristics = context.getCameraCharacteristics(cameraId)
+            val sensorRect = characteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE) ?: return
             val centerX = sensorRect.centerX()
             val centerY = sensorRect.centerY()
             val deltaX = (0.5f * sensorRect.width() / zoom).toInt()
             val deltaY = (0.5f * sensorRect.height() / zoom).toInt()
             val zoomRect = Rect(centerX - deltaX, centerY - deltaY, centerX + deltaX, centerY + deltaY)
 
-            cameraController.captureRequest?.set(CaptureRequest.SCALER_CROP_REGION, zoomRect)
-            cameraController.captureSession?.setRepeatingRequest(cameraController.captureRequest!!.build(), null, null)
+            builder.set(CaptureRequest.SCALER_CROP_REGION, zoomRect)
         }
+        Log.d("CameraSource", "Applying zoom: $zoom")
+        session.setRepeatingRequest(builder.build(), null, null)
     }
+
 
     fun getZoomRange(): Pair<Float, Float> {
         val cameraCharacteristics = context.getCameraCharacteristics(cameraId)
