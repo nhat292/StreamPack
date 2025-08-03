@@ -139,10 +139,8 @@ class CameraSource(
     }
 
     fun setZoom(zoom: Float) {
-        val cameraCharacteristics = context.getCameraCharacteristics(cameraId)
-        val maxZoom = cameraCharacteristics.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM) ?: 1.0f
-        val clampedZoom = zoom.coerceIn(1.0f, maxZoom)
-
+        val (minZoom, maxZoom) = getZoomRange()
+        val clampedZoom = zoom.coerceIn(minZoom, maxZoom)
         val startZoom = currentZoom
         val steps = 10 // number of smooth steps
         val stepSize = (clampedZoom - startZoom) / steps
