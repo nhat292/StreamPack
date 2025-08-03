@@ -78,7 +78,31 @@ val Context.cameraList: List<String>
  * @return List of back camera ids
  */
 val Context.backCameraList: List<String>
-    get() = cameraList.filter { getFacingDirection(it) == CameraCharacteristics.LENS_FACING_BACK }
+    get() {
+        val cameraManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
+        val logicalCameras = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            cameraManager.cameraIdList.filter { id ->
+                val characteristics = cameraManager.getCameraCharacteristics(id)
+                val facing = characteristics.get(CameraCharacteristics.LENS_FACING)
+                val capabilities = characteristics.get(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES)
+
+                facing == CameraCharacteristics.LENS_FACING_BACK &&
+                        capabilities?.contains(
+                            CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_LOGICAL_MULTI_CAMERA
+                        ) == true
+            }
+        } else {
+            emptyList()
+        }
+
+        return logicalCameras.ifEmpty {
+            cameraManager.cameraIdList.filter { id ->
+                getFacingDirection(id) == CameraCharacteristics.LENS_FACING_BACK
+            }
+        }
+    }
+
+
 
 /**
  * Gets front camera id list.
