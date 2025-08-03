@@ -132,12 +132,12 @@ open class BaseCameraStreamer(
     }
 
     /**
-     * Get camera max zoom level.
+     * Get camera zoom range.
      *
-     * @return maxZoom [Float]
+     * @return zoomRange [Pair<Float, Float>]
      */
-    fun getMaxZoom(): Float {
-        return cameraSource.getMaxZoom()
+    fun getZoomRange(): Pair<Float, Float> {
+        return cameraSource.getZoomRange()
     }
 
     /**

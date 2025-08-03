@@ -20,6 +20,7 @@ import android.content.Context
 import android.graphics.Rect
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CaptureRequest
+import android.os.Build
 import android.util.Size
 import android.view.Surface
 import androidx.annotation.RequiresPermission
@@ -170,11 +171,17 @@ class CameraSource(
         cameraController.captureSession?.setRepeatingRequest(cameraController.captureRequest!!.build(), null, null)
     }
 
-    fun getMaxZoom(): Float {
+    fun getZoomRange(): Pair<Float, Float> {
         val cameraCharacteristics = context.getCameraCharacteristics(cameraId)
-        return cameraCharacteristics.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM) ?: 1.0f
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val zoomRatioRange = cameraCharacteristics.get(CameraCharacteristics.CONTROL_ZOOM_RATIO_RANGE)
+            if (zoomRatioRange != null) {
+                return zoomRatioRange.lower to zoomRatioRange.upper
+            }
+        }
+        val maxZoom = cameraCharacteristics.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM) ?: 1.0f
+        return 1.0f to maxZoom
     }
-
 
     override fun release() {
         cameraController.release()
