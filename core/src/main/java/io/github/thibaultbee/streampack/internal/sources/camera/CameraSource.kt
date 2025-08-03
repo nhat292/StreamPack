@@ -157,16 +157,25 @@ class CameraSource(
     }
 
     private fun applyZoom(zoom: Float) {
-        val cameraCharacteristics = context.getCameraCharacteristics(cameraId)
-        val sensorRect = cameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE) ?: return
-        val centerX = sensorRect.centerX()
-        val centerY = sensorRect.centerY()
-        val deltaX = (0.5f * sensorRect.width() / zoom).toInt()
-        val deltaY = (0.5f * sensorRect.height() / zoom).toInt()
-        val zoomRect = Rect(centerX - deltaX, centerY - deltaY, centerX + deltaX, centerY + deltaY)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            cameraController.captureRequest?.set(CaptureRequest.CONTROL_ZOOM_RATIO, zoom)
+            cameraController.captureSession?.setRepeatingRequest(
+                cameraController.captureRequest!!.build(),
+                null,
+                null
+            )
+        } else {
+            val cameraCharacteristics = context.getCameraCharacteristics(cameraId)
+            val sensorRect = cameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE) ?: return
+            val centerX = sensorRect.centerX()
+            val centerY = sensorRect.centerY()
+            val deltaX = (0.5f * sensorRect.width() / zoom).toInt()
+            val deltaY = (0.5f * sensorRect.height() / zoom).toInt()
+            val zoomRect = Rect(centerX - deltaX, centerY - deltaY, centerX + deltaX, centerY + deltaY)
 
-        cameraController.captureRequest?.set(CaptureRequest.SCALER_CROP_REGION, zoomRect)
-        cameraController.captureSession?.setRepeatingRequest(cameraController.captureRequest!!.build(), null, null)
+            cameraController.captureRequest?.set(CaptureRequest.SCALER_CROP_REGION, zoomRect)
+            cameraController.captureSession?.setRepeatingRequest(cameraController.captureRequest!!.build(), null, null)
+        }
     }
 
     fun getZoomRange(): Pair<Float, Float> {
