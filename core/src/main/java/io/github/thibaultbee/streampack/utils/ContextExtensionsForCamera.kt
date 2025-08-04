@@ -38,6 +38,18 @@ fun Context.getCameraCharacteristics(cameraId: String): CameraCharacteristics {
     return cameraManager.getCameraCharacteristics(cameraId)
 }
 
+fun Context.getUltraWideCameraId(): String? {
+    val cm = getSystemService(Context.CAMERA_SERVICE) as CameraManager
+    return cm.cameraIdList.firstOrNull { id ->
+        val c = cm.getCameraCharacteristics(id)
+        val facing = c.get(CameraCharacteristics.LENS_FACING)
+        val focalLengths = c.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS)
+
+        facing == CameraCharacteristics.LENS_FACING_BACK &&
+                focalLengths?.any { it < 2.0f } == true // heuristic: ultra-wide < 2mm
+    }
+}
+
 /**
  * Get default camera id.
  *

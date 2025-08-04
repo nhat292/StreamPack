@@ -39,6 +39,7 @@ import io.github.thibaultbee.streampack.utils.cameraList
 import io.github.thibaultbee.streampack.utils.defaultCameraId
 import io.github.thibaultbee.streampack.utils.getCameraCharacteristics
 import io.github.thibaultbee.streampack.utils.getFacingDirection
+import io.github.thibaultbee.streampack.utils.getUltraWideCameraId
 import io.github.thibaultbee.streampack.utils.isFrameRateSupported
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -142,18 +143,30 @@ class CameraSource(
     fun setZoom(zoom: Float) {
         val (minZoom, maxZoom) = getZoomRange()
         val clampedZoom = zoom.coerceIn(minZoom, maxZoom)
-        val startZoom = currentZoom
-        val steps = 10 // number of smooth steps
-        val stepSize = (clampedZoom - startZoom) / steps
-        val delayPerStep = 300L / steps
-
-        CoroutineScope(Dispatchers.Main).launch {
-            for (i in 1..steps) {
-                val newZoom = startZoom + (stepSize * i)
-                applyZoom(newZoom)
-                delay(delayPerStep)
-            }
+        if (clampedZoom < 1 && currentZoom >= 1) {
+            cameraId = context.getUltraWideCameraId() ?: context.defaultCameraId
             currentZoom = clampedZoom
+        } else if (clampedZoom >= 1 && currentZoom < 1) {
+            cameraId = context.defaultCameraId
+            CoroutineScope(Dispatchers.Main).launch {
+                delay(50)
+                currentZoom = clampedZoom
+                applyZoom(clampedZoom)
+            }
+        } else {
+            val startZoom = currentZoom
+            val steps = 10 // number of smooth steps
+            val stepSize = (clampedZoom - startZoom) / steps
+            val delayPerStep = 300L / steps
+
+            CoroutineScope(Dispatchers.Main).launch {
+                for (i in 1..steps) {
+                    val newZoom = startZoom + (stepSize * i)
+                    applyZoom(newZoom)
+                    delay(delayPerStep)
+                }
+                currentZoom = clampedZoom
+            }
         }
     }
 
