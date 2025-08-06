@@ -145,7 +145,11 @@ class CameraSource(
         val clampedZoom = zoom.coerceIn(minZoom, maxZoom)
         if (clampedZoom < 1 && currentZoom >= 1) {
             cameraId = context.getUltraWideCameraId() ?: context.defaultCameraId
-            currentZoom = clampedZoom
+            CoroutineScope(Dispatchers.Main).launch {
+                delay(50)
+                currentZoom = clampedZoom
+                applyZoom(clampedZoom)
+            }
         } else if (clampedZoom >= 1 && currentZoom < 1) {
             cameraId = context.defaultCameraId
             CoroutineScope(Dispatchers.Main).launch {
