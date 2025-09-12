@@ -55,7 +55,7 @@ class RtmpProducer(
         withContext(coroutineDispatcher) {
             try {
                 isOnError = false
-                socket.connect("$url live=1 flashver=FMLE/3.0\\20(compatible;\\20FMSc/1.0)")
+                socket.connect("$url live=1")
                 _isConnected = true
                 onConnectionListener?.onSuccess()
             } catch (e: Exception) {
