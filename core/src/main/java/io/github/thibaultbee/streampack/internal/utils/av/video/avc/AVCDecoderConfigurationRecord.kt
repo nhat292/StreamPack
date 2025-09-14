@@ -33,44 +33,55 @@ data class AVCDecoderConfigurationRecord(
     private val sps: List<ByteBuffer>,
     private val pps: List<ByteBuffer>
 ): ByteBufferWriter() {
-    private val spsNoStartCode: List<ByteBuffer> = sps.map { it.removeStartCode() }
-    private val ppsNoStartCode: List<ByteBuffer> = pps.map { it.removeStartCode() }
+    private val safeSps: List<ByteBuffer> = sps.map { buf ->
+        if (buf.remaining() >= 4 && (buf.get(0).toInt() == 0x00 && buf.get(1).toInt() == 0x00)) {
+            buf.removeStartCode()
+        } else {
+            buf
+        }
+    }
 
-    override val size: Int = getSize(spsNoStartCode, ppsNoStartCode)
+    private val safePps: List<ByteBuffer> = pps.map { buf ->
+        if (buf.remaining() >= 4 && (buf.get(0).toInt() == 0x00 && buf.get(1).toInt() == 0x00)) {
+            buf.removeStartCode()
+        } else {
+            buf
+        }
+    }
+
+    override val size: Int = getSize(safeSps, safePps)
 
     override fun write(output: ByteBuffer) {
-        output.put(configurationVersion) // configurationVersion
+        output.put(configurationVersion.toByte()) // configurationVersion
         output.put(profileIdc) // AVCProfileIndication
         output.put(profileCompatibility) // profile_compatibility
         output.put(levelIdc) // AVCLevelIndication
 
-        output.put(0xff.toByte()) // 6 bits reserved + lengthSizeMinusOne - 4 bytes
-        output.put((0b111.toByte() shl 5) or (spsNoStartCode.size)) // 3 bits reserved + numOfSequenceParameterSets - 5 bytes
-        spsNoStartCode.forEach {
-            output.putShort(it.remaining()) // sequenceParameterSetLength
+        // Force NALU length = 4 bytes (00 00 00 01)
+        output.put(0xFF.toByte()) // 6 bits reserved + lengthSizeMinusOne=3 → 4-byte NALU length
+
+        // SPS
+        output.put(((0b111 shl 5) or (safeSps.size and 0x1F)).toByte())
+        safeSps.forEach {
+            output.putShort(it.remaining())
             output.put(it)
         }
 
-        output.put(ppsNoStartCode.size) // numOfPictureParameterSets
-        ppsNoStartCode.forEach {
-            output.putShort(it.remaining()) // sequenceParameterSetLength
+        // PPS
+        output.put(safePps.size.toByte())
+        safePps.forEach {
+            output.putShort(it.remaining())
             output.put(it)
         }
 
-        if ((profileIdc == 100.toByte()) || (profileIdc == 110.toByte()) || (profileIdc == 122.toByte()) || (profileIdc == 144.toByte())) {
-            output.put(
-                (0b111111 shl 2) // reserved
-                        or chromaFormat.value.toInt() // chroma_format
-            )
-            output.put(
-                (0b11111 shl 3) // reserved
-                        or 0 // bit_depth_luma_minus8
-            )
-            output.put(
-                (0b11111 shl 3) // reserved
-                        or 0 // bit_depth_chroma_minus8
-            )
-            output.put(0)
+        // Extended profile support (high profiles)
+        if (profileIdc == 100.toByte() || profileIdc == 110.toByte()
+            || profileIdc == 122.toByte() || profileIdc == 144.toByte()
+        ) {
+            output.put(((0b111111 shl 2) or chromaFormat.value.toInt()).toByte())
+            output.put(0xF8.toByte()) // bit_depth_luma_minus8 = 0
+            output.put(0xF8.toByte()) // bit_depth_chroma_minus8 = 0
+            output.put(0) // num of scaling matrices
         }
     }
 
@@ -86,36 +97,25 @@ data class AVCDecoderConfigurationRecord(
             sps: List<ByteBuffer>,
             pps: List<ByteBuffer>
         ): AVCDecoderConfigurationRecord {
-            val spsNoStartCode = sps.map { it.removeStartCode() }
-            val ppsNoStartCode = pps.map { it.removeStartCode() }
-            val profileIdc: Byte = spsNoStartCode[0].get(1)
-            val profileCompatibility = spsNoStartCode[0].get(2)
-            val levelIdc = spsNoStartCode[0].get(3)
+            val spsNoStart = sps.map { it.removeStartCode() }
+            val profileIdc = spsNoStart[0].get(1)
+            val profileCompatibility = spsNoStart[0].get(2)
+            val levelIdc = spsNoStart[0].get(3)
             return AVCDecoderConfigurationRecord(
                 profileIdc = profileIdc,
                 profileCompatibility = profileCompatibility,
                 levelIdc = levelIdc,
-                sps = spsNoStartCode,
-                pps = ppsNoStartCode
+                sps = sps,
+                pps = pps
             )
         }
 
-        fun getSize(sps: ByteBuffer, pps: ByteBuffer) = getSize(listOf(sps), listOf(pps))
-
         fun getSize(sps: List<ByteBuffer>, pps: List<ByteBuffer>): Int {
-            var size =
-                AVC_DECODER_CONFIGURATION_RECORD_SIZE
-            sps.forEach {
-                size += 2 + it.remaining() - it.startCodeSize
-            }
-            pps.forEach {
-                size += 2 + it.remaining() - it.startCodeSize
-            }
-            val spsStartCodeSize = sps[0].startCodeSize
-            val profileIdc = sps[0].get(spsStartCodeSize + 1).toInt()
-            if ((profileIdc == 100) || (profileIdc == 110) || (profileIdc == 122) || (profileIdc == 144)) {
-                size += 4
-            }
+            var size = AVC_DECODER_CONFIGURATION_RECORD_SIZE
+            sps.forEach { size += 2 + (it.remaining() - it.startCodeSize) }
+            pps.forEach { size += 2 + (it.remaining() - it.startCodeSize) }
+            val profileIdc = sps[0].get(sps[0].startCodeSize + 1).toInt()
+            if (profileIdc in listOf(100, 110, 122, 144)) size += 4
             return size
         }
     }
