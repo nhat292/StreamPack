@@ -51,27 +51,31 @@ class CameraController(
     }
 
     private fun getClosestFpsRange(cameraId: String, fps: Int): Range<Int> {
-        var fpsRangeList = context.getCameraFpsList(cameraId)
-        Logger.i(TAG, "Supported FPS range list: $fpsRangeList")
+        var targetFps = fps
+        val fpsRangeList = context.getCameraFpsList(cameraId)
+        Logger.i(TAG, "Supported FPS ranges: $fpsRangeList")
 
-        // Get range that contains FPS
-        fpsRangeList =
-            fpsRangeList.filter { it.contains(fps) or it.contains(fps * 1000) } // On Samsung S4 fps range is [4000-30000] instead of [4-30]
-        if (fpsRangeList.isEmpty()) {
-            throw InvalidParameterException("Failed to find a single FPS range that contains $fps")
-        }
-
-        // Get smaller range
-        var selectedFpsRange = fpsRangeList[0]
-        fpsRangeList = fpsRangeList.drop(0)
-        fpsRangeList.forEach {
-            if ((it.upper - it.lower) < (selectedFpsRange.upper - selectedFpsRange.lower)) {
-                selectedFpsRange = it
+        while (targetFps > 0) {
+            val filtered = fpsRangeList.filter {
+                it.contains(targetFps) || it.contains(targetFps * 1000)
             }
+            if (filtered.isNotEmpty()) {
+                // Select the smallest range (tightest match)
+                var selected = filtered.first()
+                filtered.forEach {
+                    if ((it.upper - it.lower) < (selected.upper - selected.lower)) {
+                        selected = it
+                    }
+                }
+                Logger.d(TAG, "Selected FPS range for $targetFps FPS: $selected")
+                return selected
+            }
+            Logger.w(TAG, "No matching FPS range for $targetFps FPS. Lowering target…")
+            targetFps -= 1 // Decrease target gradually
         }
-
-        Logger.d(TAG, "Selected Fps range $selectedFpsRange")
-        return selectedFpsRange
+        throw InvalidParameterException(
+            "Device does not support any FPS range suitable for streaming."
+        )
     }
 
     private class CameraDeviceCallback(
