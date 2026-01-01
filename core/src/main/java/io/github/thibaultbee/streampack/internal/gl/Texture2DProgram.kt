@@ -124,7 +124,7 @@ class Texture2DProgram {
 
     private val textScale = 0.08f
     private val startX = -0.98f
-    private val startY = 0.8f
+    private val startY = 0.85f
     private val spacing = 0.075f
     private val fixedScale = 0.6f
 
@@ -428,53 +428,53 @@ class Texture2DProgram {
         GLES20.glDisable(GLES20.GL_DEPTH_TEST)
         GlUtils.checkGlError("glDisable GL_DEPTH_TEST")
 
-        if (logoTextureId == -1) {
-            val (id, ratio) = getLogoResource(context, R.drawable.logo)
-            logoTextureId = id
-            logoRatio = ratio
-            GlUtils.checkGlError("loadLogoTexture")
-        }
-
-        GLES20.glUseProgram(logoProgramHandle)
-        GlUtils.checkGlError("glUseProgram logo")
-
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE1)
-        GlUtils.checkGlError("glActiveTexture")
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, logoTextureId)
-        GlUtils.checkGlError("glBindTexture logo")
-
-        // Set Texture Uniform for Logo
-        val uLogoTextureLoc = GLES20.glGetUniformLocation(logoProgramHandle, "sTexture")
-        GlUtils.checkGlError("glGetUniformLocation sTexture")
-        if (uLogoTextureLoc != -1) {
-            GLES20.glUniform1i(uLogoTextureLoc, 1)
-            GlUtils.checkGlError("glUniform1i")
-        }
-
-        // Adjust Logo Position
-        val logoScale = 0.2f
-        var logoHorizontalScale = logoScale * logoRatio
-        logoHorizontalScale -= (logoHorizontalScale * 0.5f)
-        val logoMvpMatrix = FloatArray(16)
-        Matrix.setIdentityM(logoMvpMatrix, 0)
-        Matrix.translateM(logoMvpMatrix, 0, 0.85f, 0.85f, 0f) // Adjust position (top-right corner)
-        Matrix.scaleM(logoMvpMatrix, 0, logoHorizontalScale, logoScale, 1f)  // Scale down logo
-
-        GLES20.glUniformMatrix4fv(uLogoMVPMatrixLoc, 1, false, logoMvpMatrix, 0)
-        GlUtils.checkGlError("glUniformMatrix4fv logo")
-
-        GLES20.glEnableVertexAttribArray(aLogoPositionLoc)
-        GlUtils.checkGlError("glEnableVertexAttribArray logo position")
-        GLES20.glVertexAttribPointer(aLogoPositionLoc, 2, GLES20.GL_FLOAT, false, 0, logoVertexBuffer)
-        GlUtils.checkGlError("glVertexAttribPointer logo position")
-
-        GLES20.glEnableVertexAttribArray(aLogoTextureCoordLoc)
-        GlUtils.checkGlError("glEnableVertexAttribArray logo texture")
-        GLES20.glVertexAttribPointer(aLogoTextureCoordLoc, 2, GLES20.GL_FLOAT, false, 0, logoTexBuffer)
-        GlUtils.checkGlError("glVertexAttribPointer logo texture")
-
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
-        GlUtils.checkGlError("glDrawArrays logo")
+//        if (logoTextureId == -1) {
+//            val (id, ratio) = getLogoResource(context, R.drawable.logo)
+//            logoTextureId = id
+//            logoRatio = ratio
+//            GlUtils.checkGlError("loadLogoTexture")
+//        }
+//
+//        GLES20.glUseProgram(logoProgramHandle)
+//        GlUtils.checkGlError("glUseProgram logo")
+//
+//        GLES20.glActiveTexture(GLES20.GL_TEXTURE1)
+//        GlUtils.checkGlError("glActiveTexture")
+//        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, logoTextureId)
+//        GlUtils.checkGlError("glBindTexture logo")
+//
+//        // Set Texture Uniform for Logo
+//        val uLogoTextureLoc = GLES20.glGetUniformLocation(logoProgramHandle, "sTexture")
+//        GlUtils.checkGlError("glGetUniformLocation sTexture")
+//        if (uLogoTextureLoc != -1) {
+//            GLES20.glUniform1i(uLogoTextureLoc, 1)
+//            GlUtils.checkGlError("glUniform1i")
+//        }
+//
+//        // Adjust Logo Position
+//        val logoScale = 0.2f
+//        var logoHorizontalScale = logoScale * logoRatio
+//        logoHorizontalScale -= (logoHorizontalScale * 0.5f)
+//        val logoMvpMatrix = FloatArray(16)
+//        Matrix.setIdentityM(logoMvpMatrix, 0)
+//        Matrix.translateM(logoMvpMatrix, 0, 0.85f, 0.85f, 0f) // Adjust position (top-right corner)
+//        Matrix.scaleM(logoMvpMatrix, 0, logoHorizontalScale, logoScale, 1f)  // Scale down logo
+//
+//        GLES20.glUniformMatrix4fv(uLogoMVPMatrixLoc, 1, false, logoMvpMatrix, 0)
+//        GlUtils.checkGlError("glUniformMatrix4fv logo")
+//
+//        GLES20.glEnableVertexAttribArray(aLogoPositionLoc)
+//        GlUtils.checkGlError("glEnableVertexAttribArray logo position")
+//        GLES20.glVertexAttribPointer(aLogoPositionLoc, 2, GLES20.GL_FLOAT, false, 0, logoVertexBuffer)
+//        GlUtils.checkGlError("glVertexAttribPointer logo position")
+//
+//        GLES20.glEnableVertexAttribArray(aLogoTextureCoordLoc)
+//        GlUtils.checkGlError("glEnableVertexAttribArray logo texture")
+//        GLES20.glVertexAttribPointer(aLogoTextureCoordLoc, 2, GLES20.GL_FLOAT, false, 0, logoTexBuffer)
+//        GlUtils.checkGlError("glVertexAttribPointer logo texture")
+//
+//        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
+//        GlUtils.checkGlError("glDrawArrays logo")
 
         // Link 1 PNG
         if (LINK1.isNotEmpty() && !loadingLink1Bitmap) {
@@ -515,7 +515,7 @@ class Texture2DProgram {
                 val horizontalScale = (scale * link1Ratio) * fixedScale
                 val link1MvpMatrix = FloatArray(16)
                 Matrix.setIdentityM(link1MvpMatrix, 0)
-                Matrix.translateM(link1MvpMatrix, 0, 0.85f - (0.117f / 2) - (horizontalScale / 2) - 0.05f, 0.85f, 0f) // Adjust position (top-right corner)
+                Matrix.translateM(link1MvpMatrix, 0, 0.98f - (horizontalScale / 2), 0.85f, 0f) // Adjust position (top-right corner)
                 Matrix.scaleM(link1MvpMatrix, 0, horizontalScale, scale, 1f)  // Scale down logo
 
                 GLES20.glUniformMatrix4fv(uLink1MVPMatrixLoc, 1, false, link1MvpMatrix, 0)
