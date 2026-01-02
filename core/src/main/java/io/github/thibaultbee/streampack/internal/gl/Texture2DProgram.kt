@@ -124,7 +124,7 @@ class Texture2DProgram {
 
     private val textScale = 0.08f
     private val startX = -0.98f
-    private val startY = 0.85f
+    private val startY = 0.95f
     private val spacing = 0.075f
     private val fixedScale = 0.6f
 
