@@ -125,7 +125,7 @@ class Texture2DProgram {
     private val textScale = 0.08f
     private val startX = -0.98f
     private val startY = 0.95f
-    private val spacing = 0.075f
+    private val spacing = 0.078f
     private val fixedScale = 0.6f
 
     init {
@@ -802,7 +802,7 @@ class Texture2DProgram {
         // Create text
         if (TEXT4.isNotEmpty()) {
             if (text4TextureId == -1 || OLD_TEXT4 != TEXT4) {
-                val (id, ratio) = createTextTexture(TEXT4, 30f, Color.WHITE)
+                val (id, ratio) = createTextTexture(TEXT4, 25f, Color.WHITE)
                 text4TextureId = id
                 text4Ratio = ratio
                 OLD_TEXT4 = TEXT4
