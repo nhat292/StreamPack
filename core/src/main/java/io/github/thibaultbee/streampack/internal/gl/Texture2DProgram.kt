@@ -124,7 +124,7 @@ class Texture2DProgram {
 
     private val textScale = 0.08f
     private val startX = -0.98f
-    private val startY = 0.95f
+    private val startY = 0.9f
     private val spacing = 0.078f
     private val fixedScale = 0.6f
 
@@ -928,11 +928,11 @@ class Texture2DProgram {
             Rect().apply { paint.getTextBounds(sample, 0, sample.length, this) }.width()
 
         val padding = 14f
-        val borderWidth = 2f
+        val borderWidth = 0f
         val contentText = maxLengthText ?: text
 
         val mainTextPaint = createTextPaint(textColor)
-        val mainBgPaint = createBgPaint(Color.parseColor("#13235B"))
+        val mainBgPaint = createBgPaint(Color.parseColor("#3b59bf"))
         val matchScorePaint = createTextPaint(Color.BLACK, Paint.Align.CENTER)
         val matchScoreBgPaint = createBgPaint(Color.WHITE)
         val scorePaint = createTextPaint(Color.WHITE, Paint.Align.CENTER)
@@ -943,12 +943,12 @@ class Texture2DProgram {
         val tieBreakPaint = createTextPaint(Color.WHITE, Paint.Align.CENTER)
         val tieBreakBgPaint = createBgPaint(Color.RED)
 
-        val borderPaint = Paint().apply {
-            color = Color.GRAY
-            style = Paint.Style.STROKE
-            strokeWidth = borderWidth
-            isAntiAlias = true
-        }
+//        val borderPaint = Paint().apply {
+//            color = Color.GRAY
+//            style = Paint.Style.STROKE
+//            strokeWidth = borderWidth
+//            isAntiAlias = true
+//        }
 
         val textBounds = Rect().apply {
             mainTextPaint.getTextBounds(contentText, 0, contentText.length, this)
@@ -1019,10 +1019,10 @@ class Texture2DProgram {
         drawBlock(tieBreakScore, "tieBreakScore", tieBreakBgPaint, tieBreakPaint)
 
         // Draw border
-        canvas.drawRect(
-            RectF(borderWidth / 2, borderWidth / 2, width - borderWidth / 2, height - borderWidth / 2),
-            borderPaint
-        )
+//        canvas.drawRect(
+//            RectF(borderWidth / 2, borderWidth / 2, width - borderWidth / 2, height - borderWidth / 2),
+//            borderPaint
+//        )
 
         // Create texture
         val textureHandle = IntArray(1)
