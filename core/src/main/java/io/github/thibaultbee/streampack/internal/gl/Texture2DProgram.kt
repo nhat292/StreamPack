@@ -780,7 +780,7 @@ class Texture2DProgram {
             val horizontalScale = (textScale * text3Ratio) * fixedScale
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
-            Matrix.translateM(textMvpMatrix, 0, startX + (horizontalScale / 2), startY, 0f)  // Top-left corner
+            Matrix.translateM(textMvpMatrix, 0, startX + (horizontalScale / 2), startY + 0.03f, 0f)  // Top-left corner
             Matrix.scaleM(textMvpMatrix, 0, horizontalScale, textScale, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uText3MVPMatrixLoc, 1, false, textMvpMatrix, 0)
@@ -928,11 +928,11 @@ class Texture2DProgram {
             Rect().apply { paint.getTextBounds(sample, 0, sample.length, this) }.width()
 
         val padding = 14f
-        val borderWidth = 0f
+        val borderWidth = 1f
         val contentText = maxLengthText ?: text
 
         val mainTextPaint = createTextPaint(textColor)
-        val mainBgPaint = createBgPaint(Color.parseColor("#3b59bf"))
+        val mainBgPaint = createBgPaint(Color.parseColor("#101E53"))
         val matchScorePaint = createTextPaint(Color.BLACK, Paint.Align.CENTER)
         val matchScoreBgPaint = createBgPaint(Color.WHITE)
         val scorePaint = createTextPaint(Color.WHITE, Paint.Align.CENTER)
@@ -943,12 +943,12 @@ class Texture2DProgram {
         val tieBreakPaint = createTextPaint(Color.WHITE, Paint.Align.CENTER)
         val tieBreakBgPaint = createBgPaint(Color.RED)
 
-//        val borderPaint = Paint().apply {
-//            color = Color.GRAY
-//            style = Paint.Style.STROKE
-//            strokeWidth = borderWidth
-//            isAntiAlias = true
-//        }
+        val borderPaint = Paint().apply {
+            color = Color.GRAY
+            style = Paint.Style.STROKE
+            strokeWidth = borderWidth
+            isAntiAlias = true
+        }
 
         val textBounds = Rect().apply {
             mainTextPaint.getTextBounds(contentText, 0, contentText.length, this)
@@ -1019,10 +1019,10 @@ class Texture2DProgram {
         drawBlock(tieBreakScore, "tieBreakScore", tieBreakBgPaint, tieBreakPaint)
 
         // Draw border
-//        canvas.drawRect(
-//            RectF(borderWidth / 2, borderWidth / 2, width - borderWidth / 2, height - borderWidth / 2),
-//            borderPaint
-//        )
+        canvas.drawRect(
+            RectF(borderWidth / 2, borderWidth / 2, width - borderWidth / 2, height - borderWidth / 2),
+            borderPaint
+        )
 
         // Create texture
         val textureHandle = IntArray(1)
