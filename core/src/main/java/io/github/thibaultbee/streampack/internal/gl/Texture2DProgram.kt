@@ -660,7 +660,7 @@ class Texture2DProgram {
 
         if (TEXT1.isNotEmpty()) {
             if (textTextureId == -1 || OLD_TEXT1 != TEXT1 || OLD_MATCH_SCORE1 != MATCH_SCORE1 || OLD_TURN1 != TURN1 || OLD_SCORE1 != SCORE1|| OLD_POINT1 != POINT1 || OLD_TB_SCORE1 != TB_SCORE1) {
-                val (id, ratio) = createTextTexture(TEXT1, 30f, Color.WHITE, getMaxLengthText(), MATCH_SCORE1, SCORE1, POINT1, TURN1, TB_SCORE1)
+                val (id, ratio) = createTextTexture(TEXT1, 30f, Color.WHITE, getMaxLengthText(), MATCH_SCORE1, SCORE1, POINT1, TURN1, TB_SCORE1, Color.parseColor("#146094"))
                 textTextureId = id
                 textRatio = ratio
                 OLD_TEXT1 = TEXT1
@@ -709,7 +709,7 @@ class Texture2DProgram {
         // Create text
         if (TEXT2.isNotEmpty()) {
             if (text2TextureId == -1 || OLD_TEXT2 != TEXT2 || OLD_MATCH_SCORE2 != MATCH_SCORE2 || OLD_TURN2 != TURN2 || OLD_SCORE2 != SCORE2 || OLD_POINT2 != POINT2 || OLD_TB_SCORE2 != TB_SCORE2) {
-                val (id, ratio)  = createTextTexture(TEXT2, 30f, Color.WHITE, getMaxLengthText(), MATCH_SCORE2, SCORE2, POINT2, TURN2, TB_SCORE2)
+                val (id, ratio)  = createTextTexture(TEXT2, 30f, Color.WHITE, getMaxLengthText(), MATCH_SCORE2, SCORE2, POINT2, TURN2, TB_SCORE2, Color.parseColor("#146094"))
                 text2TextureId = id
                 text2Ratio = ratio
                 OLD_TEXT2 = TEXT2
@@ -758,7 +758,7 @@ class Texture2DProgram {
         // Create text
         if (TEXT3.isNotEmpty()) {
             if (text3TextureId == -1 || OLD_TEXT3 != TEXT3) {
-                val (id, ratio) = createTextTexture(TEXT3, 30f, Color.WHITE)
+                val (id, ratio) = createTextTexture(TEXT3, 30f, Color.parseColor("#101D54"), bgColor = Color.parseColor("#FDC738"))
                 text3TextureId = id
                 text3Ratio = ratio
                 OLD_TEXT3 = TEXT3
@@ -780,7 +780,7 @@ class Texture2DProgram {
             val horizontalScale = (textScale * text3Ratio) * fixedScale
             val textMvpMatrix = FloatArray(16)
             Matrix.setIdentityM(textMvpMatrix, 0)
-            Matrix.translateM(textMvpMatrix, 0, startX + (horizontalScale / 2), startY + 0.03f, 0f)  // Top-left corner
+            Matrix.translateM(textMvpMatrix, 0, startX + (horizontalScale / 2), startY + 0.0001f, 0f)  // Top-left corner
             Matrix.scaleM(textMvpMatrix, 0, horizontalScale, textScale, 1f)  // Scale to appropriate size
 
             GLES20.glUniformMatrix4fv(uText3MVPMatrixLoc, 1, false, textMvpMatrix, 0)
@@ -802,7 +802,7 @@ class Texture2DProgram {
         // Create text
         if (TEXT4.isNotEmpty()) {
             if (text4TextureId == -1 || OLD_TEXT4 != TEXT4) {
-                val (id, ratio) = createTextTexture(TEXT4, 25f, Color.WHITE)
+                val (id, ratio) = createTextTexture(TEXT4, 25f, Color.WHITE, bgColor = Color.parseColor("#146094"))
                 text4TextureId = id
                 text4Ratio = ratio
                 OLD_TEXT4 = TEXT4
@@ -906,6 +906,7 @@ class Texture2DProgram {
         point: String? = null,
         turn: String? = null,
         tieBreakScore: String? = null,
+        bgColor: Int? = null,
     ): Pair<Int, Float> {
 
         fun createTextPaint(color: Int, align: Paint.Align = Paint.Align.LEFT): Paint =
@@ -932,7 +933,7 @@ class Texture2DProgram {
         val contentText = maxLengthText ?: text
 
         val mainTextPaint = createTextPaint(textColor)
-        val mainBgPaint = createBgPaint(Color.parseColor("#101E53"))
+        val mainBgPaint = createBgPaint(bgColor ?: Color.parseColor("#101E53"))
         val matchScorePaint = createTextPaint(Color.BLACK, Paint.Align.CENTER)
         val matchScoreBgPaint = createBgPaint(Color.WHITE)
         val scorePaint = createTextPaint(Color.WHITE, Paint.Align.CENTER)
@@ -944,7 +945,7 @@ class Texture2DProgram {
         val tieBreakBgPaint = createBgPaint(Color.RED)
 
         val borderPaint = Paint().apply {
-            color = Color.GRAY
+            color = Color.parseColor("#FDC738")
             style = Paint.Style.STROKE
             strokeWidth = borderWidth
             isAntiAlias = true
