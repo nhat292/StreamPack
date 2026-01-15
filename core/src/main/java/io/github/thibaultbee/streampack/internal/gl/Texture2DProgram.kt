@@ -128,6 +128,13 @@ class Texture2DProgram {
     private val spacing = 0.078f
     private val fixedScale = 0.6f
 
+    private var tickerTextureId = -1
+    private var tickerRatio = 0f
+
+    private var tickerX = 1.2f          // start off-screen (right)
+    private val tickerY = -0.95f         // bottom of screen
+    private val tickerSpeed = 0.0035f    // adjust speed
+
     init {
         programHandle = createProgram(VERTEX_SHADER, FRAGMENT_SHADER_EXT)
         if (programHandle == 0) {
@@ -475,6 +482,59 @@ class Texture2DProgram {
 //
 //        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
 //        GlUtils.checkGlError("glDrawArrays logo")
+
+        if (TICKER_TEXT.isNotEmpty()) {
+            if (tickerTextureId == -1 || OLD_TICKER_TEXT != TICKER_TEXT) {
+                val (id, ratio) = createTextTexture(
+                    text = TICKER_TEXT,
+                    size = 28f,
+                    textColor = Color.WHITE,
+                    bgColor = Color.parseColor("#66000000") // semi-transparent
+                )
+                tickerTextureId = id
+                tickerRatio = ratio
+                OLD_TICKER_TEXT = TICKER_TEXT
+            }
+        }
+
+        if (tickerTextureId != -1) {
+            GLES20.glUseProgram(text4ProgramHandle)
+
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE9)
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, tickerTextureId)
+
+            val uTextureLoc = GLES20.glGetUniformLocation(text4ProgramHandle, "sTexture")
+            if (uTextureLoc != -1) {
+                GLES20.glUniform1i(uTextureLoc, 9)
+            }
+
+            // Calculate scale
+            val scaleY = 0.07f
+            val scaleX = scaleY * tickerRatio
+
+            // ⏱️ Move left every frame
+            tickerX -= tickerSpeed
+
+            // 🔁 Loop when fully off-screen
+            if (tickerX < -1.2f - scaleX) {
+                tickerX = 1.2f
+            }
+
+            val mvp = FloatArray(16)
+            Matrix.setIdentityM(mvp, 0)
+            Matrix.translateM(mvp, 0, tickerX, tickerY, 0f)
+            Matrix.scaleM(mvp, 0, scaleX, scaleY, 1f)
+
+            GLES20.glUniformMatrix4fv(uText4MVPMatrixLoc, 1, false, mvp, 0)
+
+            GLES20.glEnableVertexAttribArray(aText4PositionLoc)
+            GLES20.glVertexAttribPointer(aText4PositionLoc, 2, GLES20.GL_FLOAT, false, 0, text3VertexBuffer)
+
+            GLES20.glEnableVertexAttribArray(aText4TextureCoordLoc)
+            GLES20.glVertexAttribPointer(aText4TextureCoordLoc, 2, GLES20.GL_FLOAT, false, 0, text3TexBuffer)
+
+            GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
+        }
 
         // Link 1 PNG
         if (LINK1.isNotEmpty() && !loadingLink1Bitmap) {
@@ -1135,6 +1195,9 @@ class Texture2DProgram {
         var OLD_TB_SCORE2: String? = null
 
         var IS_TENNIS = false
+
+        var TICKER_TEXT = "🔥 Welcome to the Live Stream • Subscribe & Like • Follow us!"
+        var OLD_TICKER_TEXT = ""
 
         // Simple vertex shader, used for all programs.
         private const val VERTEX_SHADER = """uniform mat4 uMVPMatrix;
