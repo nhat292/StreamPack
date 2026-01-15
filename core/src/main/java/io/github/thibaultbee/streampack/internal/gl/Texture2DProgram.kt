@@ -131,9 +131,9 @@ class Texture2DProgram {
     private var tickerTextureId = -1
     private var tickerRatio = 0f
 
-    private var tickerX = 1.2f          // start off-screen (right)
-    private val tickerY = -0.95f         // bottom of screen
-    private val tickerSpeed = 0.0035f    // adjust speed
+    private var tickerX = 10f
+    private val tickerY = -0.95f
+    private val tickerSpeed = 0.0035f
 
     init {
         programHandle = createProgram(VERTEX_SHADER, FRAGMENT_SHADER_EXT)
@@ -489,7 +489,8 @@ class Texture2DProgram {
                     text = TICKER_TEXT,
                     size = 28f,
                     textColor = Color.WHITE,
-                    bgColor = Color.parseColor("#66000000") // semi-transparent
+                    bgColor = Color.parseColor("#66000000"),
+                    borderWidth = 0f,
                 )
                 tickerTextureId = id
                 tickerRatio = ratio
@@ -512,12 +513,15 @@ class Texture2DProgram {
             val scaleY = 0.07f
             val scaleX = scaleY * tickerRatio
 
+            if (tickerX == 10f) {
+                tickerX = 1.1f + (scaleX / 2)
+            }
             // ⏱️ Move left every frame
             tickerX -= tickerSpeed
 
             // 🔁 Loop when fully off-screen
-            if (tickerX < -1.2f - scaleX) {
-                tickerX = 1.2f
+            if (tickerX < -1.1f - (scaleX / 2)) {
+                tickerX = 1.1f + (scaleX / 2)
             }
 
             val mvp = FloatArray(16)
@@ -967,6 +971,7 @@ class Texture2DProgram {
         turn: String? = null,
         tieBreakScore: String? = null,
         bgColor: Int? = null,
+        borderWidth: Float = 1f
     ): Pair<Int, Float> {
 
         fun createTextPaint(color: Int, align: Paint.Align = Paint.Align.LEFT): Paint =
@@ -989,7 +994,6 @@ class Texture2DProgram {
             Rect().apply { paint.getTextBounds(sample, 0, sample.length, this) }.width()
 
         val padding = 14f
-        val borderWidth = 1f
         val contentText = maxLengthText ?: text
 
         val mainTextPaint = createTextPaint(textColor)
