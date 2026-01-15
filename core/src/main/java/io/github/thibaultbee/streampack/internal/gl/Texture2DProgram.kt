@@ -639,7 +639,7 @@ class Texture2DProgram {
                 val horizontalScale = (scale * link2Ratio) * fixedScale
                 val link2MvpMatrix = FloatArray(16)
                 Matrix.setIdentityM(link2MvpMatrix, 0)
-                Matrix.translateM(link2MvpMatrix, 0, startX + (horizontalScale / 2), -0.85f, 0f) // Adjust position (top-right corner)
+                Matrix.translateM(link2MvpMatrix, 0, startX + (horizontalScale / 2), if (TICKER_TEXT.isNotEmpty()) -0.82f else -0.85f, 0f) // Adjust position (top-right corner)
                 Matrix.scaleM(link2MvpMatrix, 0, horizontalScale, scale, 1f)  // Scale down logo
 
                 GLES20.glUniformMatrix4fv(uLink2MVPMatrixLoc, 1, false, link2MvpMatrix, 0)
@@ -699,7 +699,7 @@ class Texture2DProgram {
                 val horizontalScale = (scale * link3Ratio) * fixedScale
                 val link3MvpMatrix = FloatArray(16)
                 Matrix.setIdentityM(link3MvpMatrix, 0)
-                Matrix.translateM(link3MvpMatrix, 0, 0.98f - (horizontalScale / 2), -0.85f, 0f) // Adjust position (top-right corner)
+                Matrix.translateM(link3MvpMatrix, 0, 0.98f - (horizontalScale / 2), if (TICKER_TEXT.isNotEmpty()) -0.82f else -0.85f, 0f) // Adjust position (top-right corner)
                 Matrix.scaleM(link3MvpMatrix, 0, horizontalScale, scale, 1f)  // Scale down logo
 
                 GLES20.glUniformMatrix4fv(uLink3MVPMatrixLoc, 1, false, link3MvpMatrix, 0)
