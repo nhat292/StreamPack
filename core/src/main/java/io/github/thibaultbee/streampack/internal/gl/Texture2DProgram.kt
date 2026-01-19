@@ -131,7 +131,7 @@ class Texture2DProgram {
     private var tickerTextureId = -1
     private var tickerRatio = 0f
 
-    private var tickerX = 10f
+    private var tickerX = 1.1f
     private val tickerY = -0.95f
     private val tickerSpeed = 0.0035f
 
@@ -483,6 +483,7 @@ class Texture2DProgram {
 //        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
 //        GlUtils.checkGlError("glDrawArrays logo")
 
+        var resetTickerTextPosition = false
         if (TICKER_TEXT.isNotEmpty()) {
             if (tickerTextureId == -1 || OLD_TICKER_TEXT != TICKER_TEXT) {
                 val (id, ratio) = createTextTexture(
@@ -495,6 +496,7 @@ class Texture2DProgram {
                 tickerTextureId = id
                 tickerRatio = ratio
                 OLD_TICKER_TEXT = TICKER_TEXT
+                resetTickerTextPosition = true
             }
         }
 
@@ -513,7 +515,7 @@ class Texture2DProgram {
             val scaleY = 0.07f
             val scaleX = scaleY * tickerRatio
 
-            if (tickerX == 10f) {
+            if (resetTickerTextPosition) {
                 tickerX = 1.1f + (scaleX / 2)
             }
             // ⏱️ Move left every frame
