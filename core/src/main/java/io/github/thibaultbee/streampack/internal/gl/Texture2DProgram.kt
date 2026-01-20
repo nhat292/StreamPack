@@ -391,7 +391,7 @@ class Texture2DProgram {
      * @param texStride Width, in bytes, of the texture data for each vertex.
      */
     @OptIn(DelicateCoroutinesApi::class)
-    fun draw(
+    suspend fun draw(
         context: Context,
         mvpMatrix: FloatArray, vertexBuffer: FloatBuffer, logoVertexBuffer: FloatBuffer, firstVertex: Int,
         vertexCount: Int, coordsPerVertex: Int, vertexStride: Int,
@@ -498,6 +498,9 @@ class Texture2DProgram {
                 OLD_TICKER_TEXT = TICKER_TEXT
                 resetTickerTextPosition = true
             }
+        } else {
+            OLD_TICKER_TEXT = ""
+            tickerTextureId = -1
         }
 
         if (tickerTextureId != -1) {
@@ -518,12 +521,14 @@ class Texture2DProgram {
             if (resetTickerTextPosition) {
                 tickerX = 1.1f + (scaleX / 2)
             }
-            // ⏱️ Move left every frame
-            tickerX -= tickerSpeed
 
-            // 🔁 Loop when fully off-screen
             if (tickerX < -1.1f - (scaleX / 2)) {
-                tickerX = 1.1f + (scaleX / 2)
+                tickerX = -1.1f - (scaleX / 2)
+                withTimeout(100_000) {
+                    tickerX = 1.1f + (scaleX / 2)
+                }
+            } else {
+                tickerX -= tickerSpeed
             }
 
             val mvp = FloatArray(16)
