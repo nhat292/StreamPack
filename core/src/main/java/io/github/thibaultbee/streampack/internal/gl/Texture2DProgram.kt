@@ -486,6 +486,7 @@ class Texture2DProgram {
         var resetTickerTextPosition = false
         if (TICKER_TEXT.isNotEmpty()) {
             if (tickerTextureId == -1 || OLD_TICKER_TEXT != TICKER_TEXT) {
+                RESET_TICKER_TEXT = false
                 val (id, ratio) = createTextTexture(
                     text = TICKER_TEXT,
                     size = 28f,
@@ -498,6 +499,9 @@ class Texture2DProgram {
                 OLD_TICKER_TEXT = TICKER_TEXT
                 resetTickerTextPosition = true
             }
+        } else {
+            tickerTextureId = -1
+            OLD_TICKER_TEXT = ""
         }
 
         if (tickerTextureId != -1) {
@@ -523,7 +527,8 @@ class Texture2DProgram {
 
             // 🔁 Loop when fully off-screen
             if (tickerX < -1.1f - (scaleX / 2)) {
-                tickerX = 1.1f + (scaleX / 2)
+//                tickerX = 1.1f + (scaleX / 2)
+                RESET_TICKER_TEXT = true
             }
 
             val mvp = FloatArray(16)
@@ -1204,6 +1209,7 @@ class Texture2DProgram {
 
         var TICKER_TEXT = "🔥 Welcome to the Live Stream • Subscribe & Like • Follow us!"
         var OLD_TICKER_TEXT = ""
+        var RESET_TICKER_TEXT = false
 
         // Simple vertex shader, used for all programs.
         private const val VERTEX_SHADER = """uniform mat4 uMVPMatrix;
