@@ -513,7 +513,7 @@ class Texture2DProgram {
 
             // Calculate scale
             val scaleY = 0.07f
-            val scaleX = scaleY * tickerRatio
+            val scaleX = (scaleY * tickerRatio) * fixedScale
 
             if (resetTickerTextPosition) {
                 tickerX = 1.1f + (scaleX / 2)
